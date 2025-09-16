@@ -4,6 +4,8 @@ nlc (Natural Language → Command)
 
 Usage:
     nlc MESSAGE...
+    nlc --version
+    nlc -v
 
 Examples:
     nlc convert input.webm to output.mp4 using the best standards and ffmpeg
@@ -17,6 +19,7 @@ from textwrap import dedent
 
 # ---- Config ----
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+VERSION = "0.1.0"
 
 # ANSI
 BOLD = "\033[1m"
@@ -60,6 +63,10 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__.strip())
         sys.exit(1)
+
+    if sys.argv[1] in ("--version", "-v"):
+        print(f"nlc version {VERSION}")
+        sys.exit(0)
 
     user_request = " ".join(sys.argv[1:]).strip()
     api_key = os.getenv("OPENAI_API_KEY")
