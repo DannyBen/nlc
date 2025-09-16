@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""
+nlc (Natural Language → Command)
+
+Usage:
+    nlc MESSAGE...
+
+Examples:
+    nlc convert input.webm to output.mp4 using the best standards and ffmpeg
+    nlc list all docker images older than a month and delete them (dry run)
+"""
+
+import os
+import sys
+import subprocess
+from textwrap import dedent
+
+# ---- Config ----
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+# ANSI helpers
+BOLD = "\033[1m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+DIM = "\033[2m"
+RESET = "\033[0m"
+CLRLINE = "\033[2K"
+CR = "\r"
+
+SYSTEM_PROMPT = dedent("""
+You are a command-line generator.
+Return ONLY the final shell command as a single line for a Unix-like shell (bash/zsh).
+NO backticks. NO explanations. NO comments (except when doing a dry run as specified below).
+Prefer widely-available tools. For media tasks, prefer ffmpeg when asked.
+Default to safe, non-destructive options unless the user explicitly requests otherwise.
+Quote/escape filenames or arguments when necessary.
+If the request is ambiguous, choose sensible defaults rather than asking questions.
+Output must be a single executable command line suitable for /bin/bash -lc.
+
+DRY-RUN RULE:
+- If the user requests a dry run in plain language OR includes the token "--dry",
+  then output the command as a single commented line starting with "# " followed by the exact command.
+  Do not add any other text.
+""").strip()
+
+def fail(msg, code=2):
+    print(f"Error: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__.strip())
+        sys.exit(1)
+
+    user_request = " ".join(sys.argv[1:]).strip()
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        fail("OPENAI_API_KEY not set")
+
+    try:
+        from openai import OpenAI
+    except Exception:
+        fail("OpenAI Python package not found. Install with: pip install openai")
+
+    client = OpenAI(api_key=api_key)
+
+    # Show minimal "processing..." immediately
+    print(f"{YELLOW}processing...{RESET}", end="", flush=True)
+
+    try:
+        resp = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_request},
+            ],
+            temperature=0,
+            max_tokens=256,
+        )
+        raw = (resp.choices[0].message.content or "")
+    except Exception as e:
+        # Replace the processing line with error
+        print(f"{CR}{CLRLINE}Error contacting OpenAI: {e}")
+        sys.exit(2)
+
+    cmd = raw.replace("\n", " ").replace("\r", " ").strip().strip("`")
+
+    if not cmd:
+        print(f"{CR}{CLRLINE}Error: Model returned an empty command")
+        sys.exit(2)
+
+    # If dry-run (model commented it), just show and exit without prompt
+    if cmd.lstrip().startswith("#"):
+        print(f"{CR}{CLRLINE}{DIM}{cmd}{RESET}")
+        sys.exit(0)
+
+    # Replace "processing..." with the command (bold+green)
+    print(f"{CR}{CLRLINE}{BOLD}{GREEN}{cmd}{RESET}")
+
+    # Short prompt text, exactly as requested
+    print("\nEnter to execute, any other key to cancel.", flush=True)
+
+    try:
+        choice = input("> ").strip()
+    except KeyboardInterrupt:
+        print("\nCancelled.")
+        sys.exit(130)
+
+    if choice == "":
+        try:
+            completed = subprocess.run(cmd, shell=True, executable="/bin/bash")
+            sys.exit(completed.returncode)
+        except KeyboardInterrupt:
+            print("\nInterrupted.")
+            sys.exit(130)
+    else:
+        print("Cancelled.")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()
