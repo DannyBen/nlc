@@ -74,7 +74,7 @@ def main():
     client = OpenAI(api_key=api_key)
 
     # minimal status
-    print(f"{MAGENTA}processing...{RESET}", end="", flush=True)
+    print(f"\n{MAGENTA}processing...{RESET}", end="", flush=True)
 
     try:
         resp = client.chat.completions.create(
@@ -104,6 +104,8 @@ def main():
     except KeyboardInterrupt:
         print("\nCancelled.")
         sys.exit(130)
+
+    print("")
 
     if choice == "":
         try:
