@@ -7,7 +7,7 @@ Usage:
 
 Examples:
     nlc convert input.webm to output.mp4 using the best standards and ffmpeg
-    nlc list all docker images older than a month and delete them (dry run)
+    nlc list all docker images older than a month and delete them
 """
 
 import os
@@ -18,34 +18,43 @@ from textwrap import dedent
 # ---- Config ----
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-# ANSI helpers
+# ANSI
 BOLD = "\033[1m"
 GREEN = "\033[32m"
-YELLOW = "\033[33m"
-DIM = "\033[2m"
+MAGENTA = "\033[35m"
+BLUE = "\033[34m"
 RESET = "\033[0m"
 CLRLINE = "\033[2K"
 CR = "\r"
 
 SYSTEM_PROMPT = dedent("""
 You are a command-line generator.
-Return ONLY the final shell command as a single line for a Unix-like shell (bash/zsh).
-NO backticks. NO explanations. NO comments (except when doing a dry run as specified below).
+Return ONLY an executable bash command or sequence of commands.
+NO backticks. NO explanations. NO comments.
 Prefer widely-available tools. For media tasks, prefer ffmpeg when asked.
-Default to safe, non-destructive options unless the user explicitly requests otherwise.
+Default to safe, non-destructive options unless explicitly requested otherwise.
 Quote/escape filenames or arguments when necessary.
 If the request is ambiguous, choose sensible defaults rather than asking questions.
-Output must be a single executable command line suitable for /bin/bash -lc.
-
-DRY-RUN RULE:
-- If the user requests a dry run in plain language OR includes the token "--dry",
-  then output the command as a single commented line starting with "# " followed by the exact command.
-  Do not add any other text.
+Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
 """).strip()
 
 def fail(msg, code=2):
     print(f"Error: {msg}", file=sys.stderr)
     sys.exit(code)
+
+def strip_code_fences(s: str) -> str:
+    s = s.strip()
+    if s.startswith("```"):
+        # remove leading fence line
+        lines = s.splitlines()
+        # drop first and last fence-like lines
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        s = "\n".join(lines).strip()
+    # also handle single/backtick wrapping accidentally returned
+    return s.strip("`").strip()
 
 def main():
     if len(sys.argv) < 2:
@@ -64,8 +73,8 @@ def main():
 
     client = OpenAI(api_key=api_key)
 
-    # Show minimal "processing..." immediately
-    print(f"{YELLOW}processing...{RESET}", end="", flush=True)
+    # minimal status
+    print(f"{MAGENTA}processing...{RESET}", end="", flush=True)
 
     try:
         resp = client.chat.completions.create(
@@ -75,39 +84,30 @@ def main():
                 {"role": "user", "content": user_request},
             ],
             temperature=0,
-            max_tokens=256,
+            max_tokens=512,
         )
-        raw = (resp.choices[0].message.content or "")
+        raw = resp.choices[0].message.content or ""
     except Exception as e:
-        # Replace the processing line with error
         print(f"{CR}{CLRLINE}Error contacting OpenAI: {e}")
         sys.exit(2)
 
-    cmd = raw.replace("\n", " ").replace("\r", " ").strip().strip("`")
-
+    cmd = strip_code_fences(raw)
     if not cmd:
-        print(f"{CR}{CLRLINE}Error: Model returned an empty command")
+        print(f"{CR}{CLRLINE}Error: Model returned empty output")
         sys.exit(2)
 
-    # If dry-run (model commented it), just show and exit without prompt
-    if cmd.lstrip().startswith("#"):
-        print(f"{CR}{CLRLINE}{DIM}{cmd}{RESET}")
-        sys.exit(0)
-
-    # Replace "processing..." with the command (bold+green)
-    print(f"{CR}{CLRLINE}{BOLD}{GREEN}{cmd}{RESET}")
-
-    # Short prompt text, exactly as requested
-    print("\nEnter to execute, any other key to cancel.", flush=True)
+    # show the command (keeps newlines), replacing "processing..."
+    print(f"{CR}{CLRLINE}{BLUE}$ {BOLD}{GREEN}{cmd}{RESET} ", end="", flush=True)
 
     try:
-        choice = input("> ").strip()
+        choice = input().strip()
     except KeyboardInterrupt:
         print("\nCancelled.")
         sys.exit(130)
 
     if choice == "":
         try:
+            # Run as one bash block; newlines/pipes are fine.
             completed = subprocess.run(cmd, shell=True, executable="/bin/bash")
             sys.exit(completed.returncode)
         except KeyboardInterrupt:
