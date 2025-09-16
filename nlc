@@ -10,15 +10,25 @@ Usage:
 Examples:
     nlc convert input.webm to output.mp4 using the best standards and ffmpeg
     nlc list all docker images older than a month and delete them
+
+Environment Variables:
+    OPENAI_API_KEY - Your OpenAI API key
+    GROQ_API_KEY - Your Groq API key
+    NLC_PROVIDER - The provider to use (openai or groq)
+    NLC_MODEL - The model to use
 """
 
 import os
 import sys
 import subprocess
 from textwrap import dedent
+from openai import OpenAI
 
 # ---- Config ----
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+NLC_PROVIDER = os.getenv("NLC_PROVIDER", "groq")
+NLC_MODEL = os.getenv("NLC_MODEL", "llama-3.3-70b-versatile")
+# NLC_PROVIDER = os.getenv("NLC_PROVIDER", "openai")
+# NLC_MODEL = os.getenv("NLC_MODEL", "gpt-4o-mini")
 VERSION = "0.1.0"
 
 # ANSI
@@ -70,22 +80,32 @@ def main():
 
     user_request = " ".join(sys.argv[1:]).strip()
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    if not api_key and NLC_PROVIDER == "openai":
         fail("OPENAI_API_KEY not set")
+    if not groq_api_key and NLC_PROVIDER == "groq":
+        fail("GROQ_API_KEY not set")
 
     try:
-        from openai import OpenAI
-    except Exception:
-        fail("OpenAI Python package not found. Install with: pip install openai")
+        if NLC_PROVIDER == "openai":
+            client = OpenAI(api_key=api_key)
+        elif NLC_PROVIDER == "groq":
+            client = OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=groq_api_key
+            )
+        else:
+            fail("Unsupported provider. Use 'openai' or 'groq'.")
 
-    client = OpenAI(api_key=api_key)
+    except Exception:
+        fail("Required package not found. Install with: pip install openai")
 
     # minimal status
     print(f"\n{MAGENTA}processing...{RESET}", end="", flush=True)
 
     try:
         resp = client.chat.completions.create(
-            model=OPENAI_MODEL,
+            model=NLC_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_request},
@@ -95,7 +115,7 @@ def main():
         )
         raw = resp.choices[0].message.content or ""
     except Exception as e:
-        print(f"{CR}{CLRLINE}Error contacting OpenAI: {e}")
+        print(f"{CR}{CLRLINE}Error contacting {NLC_PROVIDER}: {e}")
         sys.exit(2)
 
     cmd = strip_code_fences(raw)
