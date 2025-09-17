@@ -38,7 +38,6 @@ else:
 # ANSI
 BOLD = "\033[1m"
 GREEN = "\033[32m"
-MAGENTA = "\033[35m"
 BLUE = "\033[34m"
 RESET = "\033[0m"
 CLRLINE = "\033[2K"
@@ -150,6 +149,8 @@ def main():
 
     user_request = " ".join(sys.argv[1:]).strip()
     client = initialize_client()
+
+    print(f"\n{BLUE}$ {RESET}...", end="", flush=True)
     cmd = process_request(client, user_request)
     execute_command(cmd)
 
