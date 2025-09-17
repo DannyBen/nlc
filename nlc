@@ -27,11 +27,11 @@ from openai import OpenAI
 VERSION = "0.1.0"
 
 # ---- Config ----
-NLC_PROVIDER = os.getenv("NLC_PROVIDER", "groq")
+NLC_PROVIDER = os.getenv("NLC_PROVIDER", "openai")
 if NLC_PROVIDER == "groq":
     NLC_MODEL = os.getenv("NLC_MODEL", "llama-3.3-70b-versatile")
 elif NLC_PROVIDER == "openai":
-    NLC_MODEL = os.getenv("NLC_MODEL", "gpt-3.5-turbo")
+    NLC_MODEL = os.getenv("NLC_MODEL", "gpt-4.1-mini")
 else:
     NLC_MODEL = "llama-3.3-70b-versatile"
 
