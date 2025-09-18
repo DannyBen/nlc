@@ -24,7 +24,7 @@ import subprocess
 from textwrap import dedent
 from openai import OpenAI
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 # ---- Config ----
 NLC_PROVIDER = os.getenv("NLC_PROVIDER", "openai")
