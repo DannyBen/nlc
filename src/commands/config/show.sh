@@ -5,17 +5,29 @@ printf "  %-28s: %s\n" "$(green GROQ_API_KEY)" "$(truncate_mid "$GROQ_API_KEY")"
 echo
 
 bold_underlined "Internal Truth"
-printf "  %-28s: %s\n" "$(green config_file)" "$config_file"
-printf "  %-28s: %s\n" "$(green provider)" "$provider"
-printf "  %-28s: %s\n" "$(green model)" "$model"
-printf "  %-28s: %s\n" "$(green api_base)" "$api_base"
-printf "  %-28s: %s\n" "$(green api_key)" "$(truncate_mid "$api_key")"
-printf "  %-28s: %s\n" "$(green prompt_file)" "$prompt_file"
-printf "  %-28s: %s\n" "$(green system_prompt_file)" "$system_prompt_file"
+printf "  %-28s: %s\n" "$(green CONFIG_FILE)" "$CONFIG_FILE"
+printf "  %-28s: %s\n" "$(green PROVIDER)" "$PROVIDER"
+printf "  %-28s: %s\n" "$(green MODEL)" "$MODEL"
+printf "  %-28s: %s\n" "$(green API_BASE)" "$API_BASE"
+printf "  %-28s: %s\n" "$(green API_KEY)" "$(truncate_mid "$API_KEY")"
+printf "  %-28s: %s\n" "$(green USER_PROMPT_FILE)" "$USER_PROMPT_FILE"
+printf "  %-28s: %s\n" "$(green SYSTEM_PROMPT_FILE)" "$SYSTEM_PROMPT_FILE"
 echo
 
 bold_underlined "Prompts"
 printf "  %-28s: %s\n" "$(green system_prompt)" "$(truncate_mid "$(prompt_system)" 20)"
 printf "  %-28s: %s\n" "$(green user_prompt)" "$(truncate_mid "$(prompt_user)" 20)"
-echo   "  (run $(magenta nlc prompt show) for the full prompt)"
+echo
 
+bold_underlined "Files"
+printf "  %-28s: %s\n" \
+  "$(green config file)" \
+  "$(if [[ -f "$CONFIG_FILE" ]]; then echo exists; else echo does not exist; fi)"
+
+printf "  %-28s: %s\n" \
+  "$(green system prompt file)" \
+  "$(if [[ -f "$SYSTEM_PROMPT_FILE" ]]; then echo exists; else echo does not exist; fi)"
+
+printf "  %-28s: %s\n" \
+  "$(green user prompt file)" \
+  "$(if [[ -f "$USER_PROMPT_FILE" ]]; then echo exists; else echo does not exist; fi)"
