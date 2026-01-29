@@ -83,6 +83,12 @@ nlc_usage() {
     printf "    The model to use (default depending on provider)\n"
     echo
 
+    # :environment_variable.usage
+    printf "  %s\n" "NLC_PROMPT_FILE"
+    printf "    Path to an additional system prompt that will be appended to the default\n    system prompt.\n"
+    printf "    %s\n" "Default: $HOME/.nlc_prompt"
+    echo
+
     # :command.usage_examples
     printf "%s\n" "Examples:"
     printf "  nlc convert input.webm to output.mp4 using the best standards and ffmpeg\n"
@@ -161,6 +167,9 @@ inspect_args() {
 # src/lib/build_payload.sh
 build_payload() {
   local message="$1"
+  local system_prompt
+
+  system_prompt="$(build_prompt)"
 
   jq -n \
     --arg model "$model" \
@@ -175,6 +184,30 @@ build_payload() {
       temperature: 0,
       max_tokens: 512
     }'
+}
+
+# src/lib/build_prompt.sh
+build_prompt() {
+  local system_prompt
+
+  system_prompt=$'You are a command-line generator.
+    Return ONLY an executable bash command or sequence of commands.
+    NO backticks. NO explanations. NO comments.
+    Prefer widely-available tools.
+    Prefer common, user-facing commands over specialized or terse variants.
+    Prefer short commands, do NOT overengineer.
+    Default to safe, non-destructive options unless explicitly requested otherwise.
+    Quote/escape filenames or arguments when necessary.
+    If the request is ambiguous, choose sensible defaults rather than asking questions.
+    Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
+  '
+
+  if [[ -f "$prompt_file" ]]; then
+    system_prompt+=$'\n'
+    system_prompt+="$(cat "$prompt_file")"
+  fi
+
+  printf '%s' "$system_prompt"
 }
 
 # src/lib/colors.sh
@@ -334,11 +367,13 @@ parse_requirements() {
   # :command.environment_variables_filter
   # :command.environment_variables_default
   export NLC_PROVIDER="${NLC_PROVIDER:-openai}"
+  export NLC_PROMPT_FILE="${NLC_PROMPT_FILE:-$HOME/.nlc_prompt}"
 
   env_var_names+=("NLC_PROVIDER")
   env_var_names+=("OPENAI_API_KEY")
   env_var_names+=("GROQ_API_KEY")
   env_var_names+=("NLC_MODEL")
+  env_var_names+=("NLC_PROMPT_FILE")
   if [[ -n "${NLC_PROVIDER:-}" ]] && [[ ! ${NLC_PROVIDER:-} =~ ^(openai|groq)$ ]]; then
     printf "%s\n" "NLC_PROVIDER environment variable must be one of: openai, groq" >&2
     exit 1
@@ -420,6 +455,7 @@ initialize() {
 
   # :command.environment_variables_default
   export NLC_PROVIDER="${NLC_PROVIDER:-openai}"
+  export NLC_PROMPT_FILE="${NLC_PROMPT_FILE:-$HOME/.nlc_prompt}"
 
   # :command.variables
   # :variable.definition
@@ -435,16 +471,7 @@ initialize() {
   declare -g provider="$NLC_PROVIDER"
 
   # :variable.definition
-  declare -g system_prompt="You are a command-line generator.
-  Return ONLY an executable bash command or sequence of commands.
-  NO backticks. NO explanations. NO comments.
-  Prefer widely-available tools.
-  Prefer short commands, do NOT overengineer.
-  Default to safe, non-destructive options unless explicitly requested otherwise.
-  Quote/escape filenames or arguments when necessary.
-  If the request is ambiguous, choose sensible defaults rather than asking questions.
-  Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
-  "
+  declare -g prompt_file="$NLC_PROMPT_FILE"
 
   # src/initialize.sh
   case "$provider" in

@@ -12,25 +12,6 @@ args:
 
 filters: [api_key_found]
 
-variables:
-- name: api_base
-- name: api_key
-- name: model
-  value: $NLC_MODEL
-- name: provider
-  value: $NLC_PROVIDER
-- name: system_prompt
-  value: |
-    You are a command-line generator.
-    Return ONLY an executable bash command or sequence of commands.
-    NO backticks. NO explanations. NO comments.
-    Prefer widely-available tools.
-    Prefer short commands, do NOT overengineer.
-    Default to safe, non-destructive options unless explicitly requested otherwise.
-    Quote/escape filenames or arguments when necessary.
-    If the request is ambiguous, choose sensible defaults rather than asking questions.
-    Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
-
 environment_variables:
 - name: nlc_provider
   help: The provider to use (openai or groq)
@@ -42,6 +23,21 @@ environment_variables:
   help: Your Groq API key
 - name: nlc_model
   help: The model to use (default depending on provider)
+- name: nlc_prompt_file
+  default: "$HOME/.nlc_prompt"
+  help: >
+    Path to an additional system prompt that will be appended to the default
+    system prompt.
+
+variables:
+- name: api_base
+- name: api_key
+- name: model
+  value: $NLC_MODEL
+- name: provider
+  value: $NLC_PROVIDER
+- name: prompt_file
+  value: $NLC_PROMPT_FILE
 
 examples:
 - nlc convert input.webm to output.mp4 using the best standards and ffmpeg

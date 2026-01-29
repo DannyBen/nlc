@@ -10,6 +10,3 @@ case "$provider" in
     model="${model:-llama-3.3-70b-versatile}"
     ;;
 esac
-
-
-

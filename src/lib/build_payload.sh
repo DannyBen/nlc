@@ -1,6 +1,9 @@
 ## Build OpenAI-compatible chat payload
 build_payload() {
   local message="$1"
+  local system_prompt
+
+  system_prompt="$(build_prompt)"
 
   jq -n \
     --arg model "$model" \
