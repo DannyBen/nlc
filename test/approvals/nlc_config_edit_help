@@ -1,0 +1,9 @@
+nlc config edit - Edit the confiruation file (create it first if needed)
+
+[1mUsage:[0m
+  nlc config edit
+  nlc config edit --help | -h
+
+[1mOptions:[0m
+  [32m--help, -h[0m
+    Show this help

@@ -2,7 +2,7 @@
 execute_command() {
   local cmd="$1"
   if [[ -z "$cmd" ]]; then
-    printf "\rError: Model returned empty output" >&2
+    printf "\rerror: model returned empty output" >&2
     exit 2
   fi
 

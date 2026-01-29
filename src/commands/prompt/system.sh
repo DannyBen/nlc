@@ -1,15 +1,15 @@
 if [[ "${args[--clear]}" ]]; then
-  printf "rm $(green "$SYSTEM_PROMPT_FILE")\n"
+  printf "rm %s\n" "$(green "$SYSTEM_PROMPT_FILE")"
   rm -f "$SYSTEM_PROMPT_FILE"
 fi
 
 if [[ "${args[--default]}" ]]; then
-  printf "defaults > $(green "$SYSTEM_PROMPT_FILE")\n"
-  prompt_system > "$SYSTEM_PROMPT_FILE"
+  printf "defaults > %s\n" "$(green "$SYSTEM_PROMPT_FILE")"
+  prompt_system >"$SYSTEM_PROMPT_FILE"
 fi
 
 if [[ "${args[--edit]}" ]]; then
-  printf "$EDITOR $(green "$SYSTEM_PROMPT_FILE")\n"
+  printf "%s %s\n" "$EDITOR" "$(green "$SYSTEM_PROMPT_FILE")"
   "$EDITOR" "$SYSTEM_PROMPT_FILE"
 else
   prompt_system

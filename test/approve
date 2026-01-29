@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# === NOTE: Run this script from the project root directory
+source test/helper.bash
+# === From this point the working dir is 'test'
+
+# USAGE:
+#   test/approve              # run all tests
+#   test/approve get usage    # run only spec/get and spec/usage
+
+if [[ $# -gt 0 ]]; then
+  # Run only the tests specified as arguments
+  for arg in "$@"; do
+    file="spec/${arg}.sh"
+    [[ -f "$file" ]] || fail "test file not found: $file"
+
+    context "$file"
+    source "$file"
+  done
+else
+  # No args → run all tests
+  for file in $(find spec -type f -name '*.sh' | sort); do
+    context "$file"
+    source "$file"
+  done
+fi

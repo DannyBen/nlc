@@ -55,9 +55,7 @@ commands:
       help: Open the file for editing
     - long: --default
       short: -d
-      help: |
-        Copy the default system prompt to the override file.
-        Useful with --edit
+      help: Copy the default system prompt to the override file
     - long: --clear
       short: -c
       help: Delete the prompt override file

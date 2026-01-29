@@ -1,0 +1,27 @@
+nlc - Natural Language → Command
+
+[1mUsage:[0m
+  nlc COMMAND
+  nlc [COMMAND] --help | -h
+  nlc --version | -v
+
+[1mCommands:[0m
+  [32mrun[0m      Run a natural language command (default)
+  [32mconfig[0m   Manage configuration
+  [32mprompt[0m   Manage system prompt
+
+[1mOptions:[0m
+  [32m--help, -h[0m
+    Show this help
+
+  [32m--version, -v[0m
+    Show version number
+
+[1mEnvironment Variables:[0m
+  [32mNLC_CONFIG[0m
+    Path to the NLC config file
+    Default: /home/vagrant/.nlc/config
+
+[1mExamples:[0m
+  nlc convert input.webm to output.mp4
+  nlc list all docker images older than a month and delete them

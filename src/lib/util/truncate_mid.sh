@@ -3,7 +3,10 @@ truncate_mid() {
   local n="${2:-5}"
   local len=${#s}
 
-  (( len <= 2*n )) && { echo "$s"; return; }
+  if ((len <= 2 * n)); then
+    echo "$s"
+    return
+  fi
 
   echo "${s:0:n}...${s:len-n:n}"
 }

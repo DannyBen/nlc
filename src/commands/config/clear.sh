@@ -1,2 +1,2 @@
-printf "rm $(green "$CONFIG_FILE")"
+printf "rm %s\n" "$(green "$CONFIG_FILE")"
 rm -f "$CONFIG_FILE"

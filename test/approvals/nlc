@@ -1,0 +1,11 @@
+nlc - Natural Language → Command
+
+[1mUsage:[0m
+  nlc COMMAND
+  nlc [COMMAND] --help | -h
+  nlc --version | -v
+
+[1mCommands:[0m
+  [32mrun[0m      Run a natural language command (default)
+  [32mconfig[0m   Manage configuration
+  [32mprompt[0m   Manage system prompt
