@@ -1,0 +1,12 @@
+nlc config create - Create a new config file
+
+[1mUsage:[0m
+  nlc config create [OPTIONS]
+  nlc config create --help | -h
+
+[1mOptions:[0m
+  [32m--force, -f[0m
+    Overwrite file if it exists
+
+  [32m--help, -h[0m
+    Show this help

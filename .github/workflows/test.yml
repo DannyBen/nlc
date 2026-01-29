@@ -1,0 +1,43 @@
+name: Test
+on:
+  pull_request:
+  push: { branches: master }
+
+jobs:
+  ubuntu:
+    name: Test
+    runs-on: ubuntu-latest
+    env: 
+      LC_ALL: en_US.UTF-8   # For consistent sort order
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Add current directory to path
+      run: echo "$PWD" >> $GITHUB_PATH
+
+    - name: Run shellcheck tests
+      run: shellcheck nlc
+
+    - name: Configure Ruby for the mock server
+      uses: ruby/setup-ruby@v1
+      with: 
+        ruby-version: '3.4'
+        bundler-cache: true
+
+    - name: Install mock server dependencies
+      run: gem install sinatra puma rackup mime-types
+
+    - name: Start mock server
+      run: |
+        ruby test/mockserver/mockserver.rb &
+        sleep 3
+
+    # DEBUG
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
+    # DEBUG
+
+    - name: Run approval tests
+      run: test/approve

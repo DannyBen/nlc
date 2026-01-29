@@ -1,0 +1,13 @@
+nlc prompt - Manage system prompt
+
+[1mUsage:[0m
+  nlc prompt COMMAND
+  nlc prompt [COMMAND] --help | -h
+
+[1mCommands:[0m
+  [32msystem[0m   Show or edit system prompt
+  [32muser[0m     Show or edit user prompt
+
+[1mOptions:[0m
+  [32m--help, -h[0m
+    Show this help

@@ -1,0 +1,22 @@
+nlc prompt system - Show or edit system prompt
+
+[1mUsage:[0m
+  nlc prompt system [OPTIONS]
+  nlc prompt system --help | -h
+
+[1mOptions:[0m
+  [32m--edit, -e[0m
+    Open the file for editing
+
+  [32m--default, -d[0m
+    Copy the default system prompt to the override file
+
+  [32m--clear, -c[0m
+    Delete the prompt override file
+
+  [32m--help, -h[0m
+    Show this help
+
+[1mExamples:[0m
+  # clone the default config and open for editing"
+  nlc prompt system -ed

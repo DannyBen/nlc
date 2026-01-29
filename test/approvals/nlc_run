@@ -1,0 +1,5 @@
+missing required argument: MESSAGE
+usage: nlc [run] MESSAGE...
+examples:
+  nlc convert input.webm to output.mp4
+  nlc list all docker images older than a month and delete them

@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""
+nlc (Natural Language → Command)
+
+Usage:
+    nlc MESSAGE...
+    nlc --version
+    nlc -v
+
+Examples:
+    nlc convert input.webm to output.mp4 using the best standards and ffmpeg
+    nlc list all docker images older than a month and delete them
+
+Environment Variables:
+    OPENAI_API_KEY  Your OpenAI API key
+    GROQ_API_KEY    Your Groq API key
+    NLC_PROVIDER    The provider to use (openai or groq)
+    NLC_MODEL       The model to use (default depending on provider)
+"""
+
+import os
+import sys
+import subprocess
+from textwrap import dedent
+from openai import OpenAI
+
+VERSION = "0.1.1"
+
+# ---- Config ----
+NLC_PROVIDER = os.getenv("NLC_PROVIDER", "openai")
+if NLC_PROVIDER == "groq":
+    NLC_MODEL = os.getenv("NLC_MODEL", "llama-3.3-70b-versatile")
+elif NLC_PROVIDER == "openai":
+    NLC_MODEL = os.getenv("NLC_MODEL", "gpt-4.1-mini")
+else:
+    NLC_MODEL = "llama-3.3-70b-versatile"
+
+# ANSI
+BOLD = "\033[1m"
+GREEN = "\033[32m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
+CLRLINE = "\033[2K"
+CR = "\r"
+
+SYSTEM_PROMPT = dedent("""
+You are a command-line generator.
+Return ONLY an executable bash command or sequence of commands.
+NO backticks. NO explanations. NO comments.
+Prefer widely-available tools. For media tasks, prefer ffmpeg when asked.
+Default to safe, non-destructive options unless explicitly requested otherwise.
+Quote/escape filenames or arguments when necessary.
+If the request is ambiguous, choose sensible defaults rather than asking questions.
+Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
+""").strip()
+
+def fail(msg, code=2):
+    print(f"Error: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+def strip_code_fences(s: str) -> str:
+    s = s.strip()
+    if s.startswith("```"):
+        # remove leading fence line
+        lines = s.splitlines()
+        # drop first and last fence-like lines
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        s = "\n".join(lines).strip()
+    return s.strip("`").strip()
+
+def print_usage():
+    print(__doc__.strip())
+    sys.exit(1)
+
+def initialize_client():
+    api_key = os.getenv("OPENAI_API_KEY")
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    
+    if not api_key and NLC_PROVIDER == "openai":
+        fail("OPENAI_API_KEY not set")
+    if not groq_api_key and NLC_PROVIDER == "groq":
+        fail("GROQ_API_KEY not set")
+
+    try:
+        if NLC_PROVIDER == "openai":
+            return OpenAI(api_key=api_key)
+        elif NLC_PROVIDER == "groq":
+            return OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=groq_api_key
+            )
+        else:
+            fail("Unsupported provider. Use 'openai' or 'groq'.")
+    except Exception:
+        fail("Required package not found. Install with: pip install openai")
+
+def process_request(client, user_request):
+    try:
+        resp = client.chat.completions.create(
+            model=NLC_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_request},
+            ],
+            temperature=0,
+            max_tokens=512,
+        )
+        return strip_code_fences(resp.choices[0].message.content or "")
+    except Exception as e:
+        print(f"{CR}{CLRLINE}Error contacting {NLC_PROVIDER}: {e}")
+        sys.exit(2)
+
+def execute_command(cmd):
+    if not cmd:
+        print(f"{CR}{CLRLINE}Error: Model returned empty output")
+        sys.exit(2)
+
+    print(f"{CR}{CLRLINE}{BLUE}$ {BOLD}{GREEN}{cmd}{RESET} ", end="", flush=True)
+
+    try:
+        choice = input().strip()
+    except KeyboardInterrupt:
+        print("\nCancelled.")
+        sys.exit(130)
+
+    print("")
+
+    if choice == "":
+        try:
+            completed = subprocess.run(cmd, shell=True, executable="/bin/bash")
+            sys.exit(completed.returncode)
+        except KeyboardInterrupt:
+            print("\nInterrupted.")
+            sys.exit(130)
+    else:
+        print("Cancelled.")
+        sys.exit(0)
+
+def main():
+    if len(sys.argv) < 2:
+        print_usage()
+
+    if sys.argv[1] in ("--version", "-v"):
+        print(f"nlc version {VERSION}")
+        sys.exit(0)
+
+    user_request = " ".join(sys.argv[1:]).strip()
+    client = initialize_client()
+
+    print(f"\n{BLUE}$ {RESET}...", end="", flush=True)
+    cmd = process_request(client, user_request)
+    execute_command(cmd)
+
+if __name__ == "__main__":
+    main()

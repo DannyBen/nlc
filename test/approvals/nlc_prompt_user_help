@@ -1,0 +1,15 @@
+nlc prompt user - Show or edit user prompt
+
+[1mUsage:[0m
+  nlc prompt user [OPTIONS]
+  nlc prompt user --help | -h
+
+[1mOptions:[0m
+  [32m--edit, -e[0m
+    Open the file for editing
+
+  [32m--clear, -c[0m
+    Delete the prompt override file
+
+  [32m--help, -h[0m
+    Show this help

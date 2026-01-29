@@ -1,0 +1,9 @@
+{
+  "choices": [
+    {
+      "message": {
+        "content": "echo simulated command response"
+      }
+    }
+  ]
+}
