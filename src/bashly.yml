@@ -1,0 +1,47 @@
+name: nlc
+help: Natural Language → Command
+version: 0.2.0
+
+dependencies: [curl, jq]
+
+args:
+- name: message
+  required: true
+  repeatable: true
+  help: Natural language description of the command you want to run
+
+filters: [api_key_found]
+
+variables:
+- name: api_base
+- name: api_key
+- name: model
+  value: $NLC_MODEL
+- name: provider
+  value: $NLC_PROVIDER
+- name: system_prompt
+  value: |
+    You are a command-line generator.
+    Return ONLY an executable bash command or sequence of commands.
+    NO backticks. NO explanations. NO comments.
+    Prefer widely-available tools.
+    Default to safe, non-destructive options unless explicitly requested otherwise.
+    Quote/escape filenames or arguments when necessary.
+    If the request is ambiguous, choose sensible defaults rather than asking questions.
+    Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
+
+environment_variables:
+- name: nlc_provider
+  help: The provider to use (openai or groq)
+  default: openai
+  allowed: [openai, groq]
+- name: openai_api_key
+  help: Your OpenAI API key
+- name: groq_api_key
+  help: Your Groq API key
+- name: nlc_model
+  help: The model to use (default depending on provider)
+
+examples:
+- nlc convert input.webm to output.mp4 using the best standards and ffmpeg
+- nlc list all docker images older than a month and delete them
