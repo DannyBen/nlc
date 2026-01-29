@@ -9,18 +9,6 @@ if ((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 2))); 
 fi
 
 # :command.master_script
-# :command.root_command
-root_command() {
-  # src/root_command.sh
-  # Build request text
-  local message="${args[message]}"
-  local cmd
-
-  printf "\n%s ..." "$(blue '$')"
-  cmd="$(process_request "$message")"
-  execute_command "$cmd"
-
-}
 
 # :command.version_command
 version_command() {
@@ -31,68 +19,306 @@ version_command() {
 nlc_usage() {
   printf "nlc - Natural Language → Command\n\n"
 
-  printf "%s\n" "Usage:"
-  printf "  nlc MESSAGE...\n"
-  printf "  nlc --help | -h\n"
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc COMMAND\n"
+  printf "  nlc [COMMAND] --help | -h\n"
   printf "  nlc --version | -v\n"
+  echo
+  # :command.usage_commands
+  printf "%s\n" "$(bold "Commands:")"
+  printf "  %s   Run a natural language command (default)\n" "$(green "run")   "
+  printf "  %s   Manage configuration\n" "$(green "config")"
+  printf "  %s   Manage system prompt\n" "$(green "prompt")"
   echo
 
   # :command.long_usage
   if [[ -n "$long_usage" ]]; then
     # :command.usage_options
-    printf "%s\n" "Options:"
+    printf "%s\n" "$(bold "Options:")"
 
     # :command.usage_fixed_flags
-    printf "  %s\n" "--help, -h"
+    printf "  %s\n" "$(green "--help, -h")"
     printf "    Show this help\n"
     echo
-    printf "  %s\n" "--version, -v"
+    printf "  %s\n" "$(green "--version, -v")"
     printf "    Show version number\n"
     echo
 
-    # :command.usage_args
-    printf "%s\n" "Arguments:"
-
-    # :argument.usage
-    printf "  %s\n" "MESSAGE..."
-    printf "    Natural language description of the command you want to run\n"
-    echo
-
     # :command.usage_environment_variables
-    printf "%s\n" "Environment Variables:"
+    printf "%s\n" "$(bold "Environment Variables:")"
 
     # :environment_variable.usage
-    printf "  %s\n" "NLC_PROVIDER"
-    printf "    The provider to use (openai or groq)\n"
-    printf "    %s\n" "Allowed: openai, groq"
-    printf "    %s\n" "Default: openai"
-    echo
-
-    # :environment_variable.usage
-    printf "  %s\n" "OPENAI_API_KEY"
-    printf "    Your OpenAI API key\n"
-    echo
-
-    # :environment_variable.usage
-    printf "  %s\n" "GROQ_API_KEY"
-    printf "    Your Groq API key\n"
-    echo
-
-    # :environment_variable.usage
-    printf "  %s\n" "NLC_MODEL"
-    printf "    The model to use (default depending on provider)\n"
-    echo
-
-    # :environment_variable.usage
-    printf "  %s\n" "NLC_PROMPT_FILE"
-    printf "    Path to an additional system prompt that will be appended to the default\n    system prompt.\n"
-    printf "    %s\n" "Default: $HOME/.nlc_prompt"
+    printf "  %s\n" "$(green "NLC_CONFIG")"
+    printf "    Path to the NLC config file\n"
+    printf "    %s\n" "Default: $HOME/.nlc/config"
     echo
 
     # :command.usage_examples
-    printf "%s\n" "Examples:"
-    printf "  nlc convert input.webm to output.mp4 using the best standards and ffmpeg\n"
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  nlc convert input.webm to output.mp4\n"
     printf "  nlc list all docker images older than a month and delete them\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_run_usage() {
+  printf "nlc run - Run a natural language command\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc [run] MESSAGE...\n"
+  printf "  nlc run --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+    # :command.usage_args
+    printf "%s\n" "$(bold "Arguments:")"
+
+    # :argument.usage
+    printf "  %s\n" "$(green "MESSAGE...")"
+    printf "    Natural language description of the command you want to run\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  nlc convert input.webm to output.mp4\n"
+    printf "  nlc list all docker images older than a month and delete them\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_config_usage() {
+  printf "nlc config - Manage configuration\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc config COMMAND\n"
+  printf "  nlc config [COMMAND] --help | -h\n"
+  echo
+  # :command.usage_commands
+  printf "%s\n" "$(bold "Commands:")"
+  printf "  %s   Show confiruation and environment\n" "$(green "show")  "
+  printf "  %s   Delete the config file (falling back to default values)\n" "$(green "clear") "
+  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "edit")  "
+  printf "  %s   Create a new config file\n" "$(green "create")"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_config_show_usage() {
+  printf "nlc config show - Show confiruation and environment\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc config show\n"
+  printf "  nlc config show --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_config_clear_usage() {
+  printf "nlc config clear - Delete the config file (falling back to default values)\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc config clear\n"
+  printf "  nlc config clear --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_config_edit_usage() {
+  printf "nlc config edit - Edit the confiruation file (create it first if needed)\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc config edit\n"
+  printf "  nlc config edit --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_config_create_usage() {
+  printf "nlc config create - Create a new config file\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc config create [OPTIONS]\n"
+  printf "  nlc config create --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(green "--force, -f")"
+    printf "    Overwrite file if it exists\n"
+    echo
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_prompt_usage() {
+  printf "nlc prompt - Manage system prompt\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc prompt COMMAND\n"
+  printf "  nlc prompt [COMMAND] --help | -h\n"
+  echo
+  # :command.usage_commands
+  printf "%s\n" "$(bold "Commands:")"
+  printf "  %s   Show or edit system prompt\n" "$(green "system")"
+  printf "  %s   Show or edit user prompt\n" "$(green "user")  "
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_prompt_system_usage() {
+  printf "nlc prompt system - Show or edit system prompt\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc prompt system [OPTIONS]\n"
+  printf "  nlc prompt system --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(green "--edit, -e")"
+    printf "    Open the file for editing\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(green "--default, -d")"
+    printf "    Copy the default system prompt to the override file.\n    Useful with --edit\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(green "--clear, -c")"
+    printf "    Delete the prompt override file\n"
+    echo
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  # clone the default config and open for editing\"\n  nlc prompt system -ed\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+nlc_prompt_user_usage() {
+  printf "nlc prompt user - Show or edit user prompt\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  nlc prompt user [OPTIONS]\n"
+  printf "  nlc prompt user --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(green "--edit, -e")"
+    printf "    Open the file for editing\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(green "--clear, -c")"
+    printf "    Delete the prompt override file\n"
+    echo
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(green "--help, -h")"
+    printf "    Show this help\n"
     echo
 
   fi
@@ -169,10 +395,10 @@ build_payload() {
   local message="$1"
   local system_prompt
 
-  system_prompt="$(build_prompt)"
+  system_prompt="$(prompt_full)"
 
   jq -n \
-    --arg model "$model" \
+    --arg model "$MODEL" \
     --arg system "$system_prompt" \
     --arg user "$message" \
     '{
@@ -184,30 +410,6 @@ build_payload() {
       temperature: 0,
       max_tokens: 512
     }'
-}
-
-# src/lib/build_prompt.sh
-build_prompt() {
-  local system_prompt
-
-  system_prompt=$'You are a command-line generator.
-    Return ONLY an executable bash command or sequence of commands.
-    NO backticks. NO explanations. NO comments.
-    Prefer widely-available tools.
-    Prefer common, user-facing commands over specialized or terse variants.
-    Prefer short commands, do NOT overengineer.
-    Default to safe, non-destructive options unless explicitly requested otherwise.
-    Quote/escape filenames or arguments when necessary.
-    If the request is ambiguous, choose sensible defaults rather than asking questions.
-    Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
-  '
-
-  if [[ -f "$prompt_file" ]]; then
-    system_prompt+=$'\n'
-    system_prompt+="$(cat "$prompt_file")"
-  fi
-
-  printf '%s' "$system_prompt"
 }
 
 # src/lib/colors.sh
@@ -238,6 +440,7 @@ white() { print_in_color "\e[37m" "$*"; }
 
 bold() { print_in_color "\e[1m" "$*"; }
 underlined() { print_in_color "\e[4m" "$*"; }
+bold_underlined() { print_in_color "\e[1;4m" "$*"; }
 
 red_bold() { print_in_color "\e[1;31m" "$*"; }
 green_bold() { print_in_color "\e[1;32m" "$*"; }
@@ -256,6 +459,79 @@ magenta_underlined() { print_in_color "\e[4;35m" "$*"; }
 cyan_underlined() { print_in_color "\e[4;36m" "$*"; }
 black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
+
+# src/lib/config/config.sh
+config_show() {
+  config_load
+  ini_show
+}
+
+config_get() {
+  local key="${1-}"
+  local default_value="${2-}"
+
+  config_load
+  echo "${ini["$key"]:-$default_value}"
+}
+
+config_set() {
+  local key="${1-}"
+  shift
+  local value="$*"
+
+  config_load
+  ini["$key"]="$value"
+  config_save
+}
+
+config_del() {
+  local key="${1-}"
+
+  config_load
+  unset "ini[$key]"
+  config_save
+}
+
+config_keys() {
+  config_load
+  ini_keys
+}
+
+config_has_key() {
+  [[ $(config_get "$1") ]]
+}
+
+config_reload() {
+  declare -g config_loaded=false
+  config_load
+}
+
+config_load() {
+  [[ "${config_loaded-}" == "true" ]] && return
+
+  declare -g CONFIG_FILE=${CONFIG_FILE:=config.ini}
+  declare -g config_loaded=true
+  [[ -f "$CONFIG_FILE" ]] || touch "$CONFIG_FILE"
+  ini_load "$CONFIG_FILE"
+}
+
+config_save() {
+  ini_save "$CONFIG_FILE"
+}
+
+# src/lib/config/create_defaults.sh
+config_create_defaults() {
+  config_dir="$(dirname -- "$CONFIG_FILE")"
+  mkdir -p -- "$config_dir"
+
+  config_set ai.provider openai
+  config_set ai.model gpt-4.1-mini
+  config_set ai.api_key
+  config_set ai.api_base https://api.openai.com/v1
+  config_set prompt.system "$HOME/.nlc/system_prompt"
+  config_set prompt.user "$HOME/.nlc/user_prompt"
+  config_save
+}
 
 # src/lib/execute_command.sh
 execute_command() {
@@ -285,14 +561,88 @@ execute_command() {
 
 # src/lib/filter_api_key_found.sh
 filter_api_key_found() {
-  local openai_key="${OPENAI_API_KEY:-}"
-  local groq_key="${GROQ_API_KEY:-}"
-
-  if [[ "$provider" == "openai" && -z "$openai_key" ]]; then
+  if [[ "$PROVIDER" == "openai" && -z "$OPENAI_API_KEY" ]]; then
     echo "OPENAI_API_KEY not set"
-  elif [[ "$provider" == "groq" && -z "$groq_key" ]]; then
+  elif [[ "$PROVIDER" == "groq" && -z "$GROQ_API_KEY" ]]; then
     echo "GROQ_API_KEY not set"
   fi
+}
+
+# src/lib/ini.sh
+ini_load() {
+  unset ini
+  declare -gA ini
+
+  local ini_file="$1"
+
+  local section=""
+  local key=""
+  local value=""
+  local section_regex="^\[(.+)\]"
+  local key_regex="^([^ =]+) *= *(.*) *$"
+  local comment_regex="^;"
+
+  while IFS= read -r line; do
+    if [[ $line =~ $comment_regex ]]; then
+      continue
+    elif [[ $line =~ $section_regex ]]; then
+      section="${BASH_REMATCH[1]}."
+    elif [[ $line =~ $key_regex ]]; then
+      key="${BASH_REMATCH[1]}"
+      value="${BASH_REMATCH[2]}"
+      [[ $value == *\$* ]] && eval "value=\"$value\""
+      ini["${section}${key}"]="$value"
+    fi
+  done <"$ini_file"
+}
+
+ini_save() {
+  declare -gA ini
+
+  local ini_file="$1"
+
+  local current_section=""
+  local has_free_keys=false
+
+  rm -f "$ini_file"
+
+  for key in $(ini_keys); do
+    [[ $key == *.* ]] && continue
+    has_free_keys=true
+    value="${ini[$key]}"
+    echo "$key = $value" >>"$ini_file"
+  done
+
+  [[ "${has_free_keys}" == "true" ]] && echo >>"$ini_file"
+
+  for key in $(ini_keys); do
+    [[ $key == *.* ]] || continue
+    value="${ini[$key]}"
+    IFS="." read -r section_name key_name <<<"$key"
+
+    if [[ "$current_section" != "$section_name" ]]; then
+      [[ $current_section ]] && echo >>"$ini_file"
+      echo "[$section_name]" >>"$ini_file"
+      current_section="$section_name"
+    fi
+
+    echo "$key_name = $value" >>"$ini_file"
+  done
+}
+
+ini_show() {
+  declare -gA ini
+
+  for key in $(ini_keys); do
+    echo "$key = ${ini[$key]}"
+  done
+}
+
+ini_keys() {
+  declare -gA ini
+
+  local keys=("${!ini[@]}")
+  for a in "${keys[@]}"; do echo "$a"; done | sort
 }
 
 # src/lib/process_request.sh
@@ -303,26 +653,63 @@ process_request() {
   local response
   local content
 
-  auth_header="Authorization: Bearer $api_key"
+  auth_header="Authorization: Bearer $API_KEY"
   payload="$(build_payload "$user_request")"
 
-  response="$(curl -sS "$api_base/chat/completions" \
+  response="$(curl -sS "$API_BASE/chat/completions" \
     -H "Content-Type: application/json" \
     -H "$auth_header" \
     -d "$payload")" || {
-      printf "\rError contacting ${provider}" >&2
+      printf "\rError contacting ${PROVIDER}" >&2
       exit 2
     }
 
   if jq -e '.error' >/dev/null 2>&1 <<<"$response"; then
     local err
     err="$(jq -r '.error.message // "Unknown error"' <<<"$response")"
-    printf "\rError contacting ${provider}: ${err}" >&2
+    printf "\rError contacting ${PROVIDER}: ${err}" >&2
     exit 2
   fi
 
   content="$(jq -r '.choices[0].message.content // ""' <<<"$response")"
   strip_code_fences "$content"
+}
+
+# src/lib/prompt/default.sh
+prompt_default() {
+  echo "You are a command-line generator."
+  echo "Return ONLY an executable bash command or sequence of commands."
+  echo "NO backticks. NO explanations. NO comments."
+  echo "Prefer widely-available tools."
+  echo "Prefer common, user-facing commands over specialized or terse variants."
+  echo "Prefer short commands, do NOT overengineer."
+  echo "Default to safe, non-destructive options unless explicitly requested otherwise."
+  echo "Quote/escape filenames or arguments when necessary."
+  echo "If the request is ambiguous, choose sensible defaults rather than asking questions."
+  echo "Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine)."
+}
+
+# src/lib/prompt/full.sh
+prompt_full() {
+  prompt_system
+  echo "---"
+  prompt_user
+}
+
+# src/lib/prompt/system.sh
+prompt_system() {
+  if [[ -s "$SYSTEM_PROMPT_FILE" ]]; then
+    cat "$SYSTEM_PROMPT_FILE"
+  else
+    prompt_default
+  fi
+}
+
+# src/lib/prompt/user.sh
+prompt_user() {
+  if [[ -f "$USER_PROMPT_FILE" ]]; then
+    cat "$USER_PROMPT_FILE"
+  fi
 }
 
 # src/lib/strip_code_fences.sh
@@ -336,7 +723,135 @@ strip_code_fences() {
   printf '%s' "$s"
 }
 
+# src/lib/truncate_mid.sh
+truncate_mid() {
+  local s="$1"
+  local n="${2:-5}"
+  local len=${#s}
+
+  (( len <= 2*n )) && { echo "$s"; return; }
+
+  echo "${s:0:n}...${s:len-n:n}"
+}
+
 # :command.command_functions
+# :command.function
+nlc_run_command() {
+
+  # src/commands/run.sh
+  # Build request text
+  local message="${args[message]}"
+  local cmd
+
+  printf "\n%s ..." "$(blue '$')"
+  cmd="$(process_request "$message")"
+  execute_command "$cmd"
+
+}
+
+# :command.function
+nlc_config_show_command() {
+
+  # src/commands/config/show.sh
+  bold_underlined "Environment"
+  printf "  %-28s: %s\n" "$(green NLC_CONFIG)" "$NLC_CONFIG"
+  printf "  %-28s: %s\n" "$(green OPENAI_API_KEY)" "$(truncate_mid "$OPENAI_API_KEY")"
+  printf "  %-28s: %s\n" "$(green GROQ_API_KEY)" "$(truncate_mid "$GROQ_API_KEY")"
+  echo
+
+  bold_underlined "Internal Truth"
+  printf "  %-28s: %s\n" "$(green config_file)" "$config_file"
+  printf "  %-28s: %s\n" "$(green provider)" "$provider"
+  printf "  %-28s: %s\n" "$(green model)" "$model"
+  printf "  %-28s: %s\n" "$(green api_base)" "$api_base"
+  printf "  %-28s: %s\n" "$(green api_key)" "$(truncate_mid "$api_key")"
+  printf "  %-28s: %s\n" "$(green prompt_file)" "$prompt_file"
+  printf "  %-28s: %s\n" "$(green system_prompt_file)" "$system_prompt_file"
+  echo
+
+  bold_underlined "Prompts"
+  printf "  %-28s: %s\n" "$(green system_prompt)" "$(truncate_mid "$(prompt_system)" 20)"
+  printf "  %-28s: %s\n" "$(green user_prompt)" "$(truncate_mid "$(prompt_user)" 20)"
+  echo   "  (run $(magenta nlc prompt show) for the full prompt)"
+
+}
+
+# :command.function
+nlc_config_clear_command() {
+
+  # src/commands/config/clear.sh
+  printf "rm $(green "$CONFIG_FILE")"
+  rm -f "$CONFIG_FILE"
+}
+
+# :command.function
+nlc_config_edit_command() {
+
+  # src/commands/config/edit.sh
+  if [[ ! -s "$file" ]]; then
+    printf "defaults > $(green "$CONFIG_FILE")\n"
+    config_create_defaults
+  fi
+
+  printf "$EDITOR $(green "$CONFIG_FILE")\n"
+  "$EDITOR" "$CONFIG_FILE"
+
+}
+
+# :command.function
+nlc_config_create_command() {
+
+  # src/commands/config/create.sh
+  force="${args[--force]}"
+  if [[ -f "$CONFIG_FILE" && -z "$force" ]]; then
+    echo "Config file already exists: $(green "$CONFIG_FILE")"
+    echo "Run with $(magenta --force) to overwrite"
+    return 2
+  fi
+
+  printf "defaults > $(green "$CONFIG_FILE")\n"
+  config_create_defaults
+
+}
+
+# :command.function
+nlc_prompt_system_command() {
+
+  # src/commands/prompt/system.sh
+  if [[ "${args[--clear]}" ]]; then
+    printf "rm $(green "$SYSTEM_PROMPT_FILE")\n"
+    rm -f "$SYSTEM_PROMPT_FILE"
+  fi
+
+  if [[ "${args[--default]}" ]]; then
+    printf "defaults > $(green "$SYSTEM_PROMPT_FILE")\n"
+    prompt_system > "$SYSTEM_PROMPT_FILE"
+  fi
+
+  if [[ "${args[--edit]}" ]]; then
+    printf "$EDITOR $(green "$SYSTEM_PROMPT_FILE")\n"
+    "$EDITOR" "$SYSTEM_PROMPT_FILE"
+  else
+    prompt_system
+  fi
+}
+
+# :command.function
+nlc_prompt_user_command() {
+
+  # src/commands/prompt/user.sh
+  if [[ "${args[--clear]}" ]]; then
+    printf "rm $(green "$USER_PROMPT_FILE")\n"
+    rm -f "$USER_PROMPT_FILE"
+  fi
+
+  if [[ "${args[--edit]}" ]]; then
+    printf "$EDITOR $(green "$USER_PROMPT_FILE")\n"
+    "$EDITOR" "$USER_PROMPT_FILE"
+  else
+    prompt_user
+  fi
+}
 
 # :command.parse_requirements
 parse_requirements() {
@@ -366,18 +881,93 @@ parse_requirements() {
 
   # :command.environment_variables_filter
   # :command.environment_variables_default
-  export NLC_PROVIDER="${NLC_PROVIDER:-openai}"
-  export NLC_PROMPT_FILE="${NLC_PROMPT_FILE:-$HOME/.nlc_prompt}"
+  export NLC_CONFIG="${NLC_CONFIG:-$HOME/.nlc/config}"
 
-  env_var_names+=("NLC_PROVIDER")
-  env_var_names+=("OPENAI_API_KEY")
-  env_var_names+=("GROQ_API_KEY")
-  env_var_names+=("NLC_MODEL")
-  env_var_names+=("NLC_PROMPT_FILE")
-  if [[ -n "${NLC_PROVIDER:-}" ]] && [[ ! ${NLC_PROVIDER:-} =~ ^(openai|groq)$ ]]; then
-    printf "%s\n" "NLC_PROVIDER environment variable must be one of: openai, groq" >&2
-    exit 1
-  fi
+  env_var_names+=("NLC_CONFIG")
+
+  # :command.command_filter
+  action=${1:-}
+
+  case $action in
+
+    run)
+      action="run"
+      shift
+      nlc_run_parse_requirements "$@"
+      shift $#
+      ;;
+
+    config)
+      action="config"
+      shift
+      nlc_config_parse_requirements "$@"
+      shift $#
+      ;;
+
+    prompt)
+      action="prompt"
+      shift
+      nlc_prompt_parse_requirements "$@"
+      shift $#
+      ;;
+
+    # :command.command_fallback
+    "")
+      nlc_usage >&2
+      exit 1
+      ;;
+
+    *)
+      action="run"
+      nlc_run_parse_requirements "$@"
+      shift $#
+      ;;
+
+  esac
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_run_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_run_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
 
   # :command.dependencies_filter
   missing_deps=
@@ -402,7 +992,7 @@ parse_requirements() {
   fi
 
   # :command.command_filter
-  action="root"
+  action="run"
 
   # :command.parse_requirements_while
   while [[ $# -gt 0 ]]; do
@@ -434,7 +1024,11 @@ parse_requirements() {
 
   # :command.required_args_filter
   if [[ -z ${args['message']+x} ]]; then
-    printf "missing required argument: MESSAGE\nusage: nlc MESSAGE...\n" >&2
+    printf "missing required argument: MESSAGE\nusage: nlc [run] MESSAGE...\n" >&2
+    # :command.examples_on_error
+    printf "examples:\n" >&2
+    printf "  nlc convert input.webm to output.mp4\n" >&2
+    printf "  nlc list all docker images older than a month and delete them\n" >&2
 
     exit 1
   fi
@@ -448,44 +1042,537 @@ parse_requirements() {
 
 }
 
+# :command.parse_requirements
+nlc_config_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_config_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action=${1:-}
+
+  case $action in
+    -*) ;;
+
+    show)
+      action="show"
+      shift
+      nlc_config_show_parse_requirements "$@"
+      shift $#
+      ;;
+
+    clear)
+      action="clear"
+      shift
+      nlc_config_clear_parse_requirements "$@"
+      shift $#
+      ;;
+
+    edit)
+      action="edit"
+      shift
+      nlc_config_edit_parse_requirements "$@"
+      shift $#
+      ;;
+
+    create)
+      action="create"
+      shift
+      nlc_config_create_parse_requirements "$@"
+      shift $#
+      ;;
+
+    # :command.command_fallback
+    "")
+      nlc_config_usage >&2
+      exit 1
+      ;;
+
+    *)
+      printf "invalid command: %s\n" "$action" >&2
+      exit 1
+      ;;
+
+  esac
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_config_show_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_config_show_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="config show"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_config_clear_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_config_clear_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="config clear"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_config_edit_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_config_edit_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="config edit"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_config_create_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_config_create_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="config create"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      # :flag.case
+      --force | -f)
+
+        # :flag.case_no_arg
+        args['--force']=1
+        shift
+        ;;
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_prompt_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_prompt_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action=${1:-}
+
+  case $action in
+    -*) ;;
+
+    system)
+      action="system"
+      shift
+      nlc_prompt_system_parse_requirements "$@"
+      shift $#
+      ;;
+
+    user)
+      action="user"
+      shift
+      nlc_prompt_user_parse_requirements "$@"
+      shift $#
+      ;;
+
+    # :command.command_fallback
+    "")
+      nlc_prompt_usage >&2
+      exit 1
+      ;;
+
+    *)
+      printf "invalid command: %s\n" "$action" >&2
+      exit 1
+      ;;
+
+  esac
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_prompt_system_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_prompt_system_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="prompt system"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      # :flag.case
+      --edit | -e)
+
+        # :flag.case_no_arg
+        args['--edit']=1
+        shift
+        ;;
+
+      # :flag.case
+      --default | -d)
+
+        # :flag.case_no_arg
+        args['--default']=1
+        shift
+        ;;
+
+      # :flag.case
+      --clear | -c)
+
+        # :flag.case_no_arg
+        args['--clear']=1
+        shift
+        ;;
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+nlc_prompt_user_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        nlc_prompt_user_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="prompt user"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      # :flag.case
+      --edit | -e)
+
+        # :flag.case_no_arg
+        args['--edit']=1
+        shift
+        ;;
+
+      # :flag.case
+      --clear | -c)
+
+        # :flag.case_no_arg
+        args['--clear']=1
+        shift
+        ;;
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
 # :command.initialize
 initialize() {
   declare -g version="0.2.0"
-  set -e
+  set -eo pipefail
 
   # :command.environment_variables_default
-  export NLC_PROVIDER="${NLC_PROVIDER:-openai}"
-  export NLC_PROMPT_FILE="${NLC_PROMPT_FILE:-$HOME/.nlc_prompt}"
+  export NLC_CONFIG="${NLC_CONFIG:-$HOME/.nlc/config}"
 
   # :command.variables
   # :variable.definition
-  declare -g api_base=""
-
-  # :variable.definition
-  declare -g api_key=""
-
-  # :variable.definition
-  declare -g model="$NLC_MODEL"
-
-  # :variable.definition
-  declare -g provider="$NLC_PROVIDER"
-
-  # :variable.definition
-  declare -g prompt_file="$NLC_PROMPT_FILE"
+  declare -g CONFIG_FILE="$NLC_CONFIG"
 
   # src/initialize.sh
-  case "$provider" in
-    openai)
-      api_base="https://api.openai.com/v1"
-      api_key="$OPENAI_API_KEY"
-      model="${model:-gpt-4.1-mini}"
-      ;;
+  declare -g PROVIDER="$(config_get ai.provider openai)"
+
+  case "$PROVIDER" in
     groq)
-      api_base="https://api.groq.com/openai/v1"
-      api_key="$GROQ_API_KEY"
-      model="${model:-llama-3.3-70b-versatile}"
+      default_base="https://api.groq.com/openai/v1"
+      default_key="$GROQ_API_KEY"
+      default_model="llama-3.3-70b-versatile"
+      ;;
+    *)
+      default_base="https://api.openai.com/v1"
+      default_key="$OPENAI_API_KEY"
+      default_model=gpt-4.1-mini
       ;;
   esac
+
+  declare -g MODEL="$(config_get ai.model "$default_model")"
+  declare -g API_KEY="$(config_get ai.api_key "$default_key")"
+  declare -g API_BASE="$(config_get ai.api_base "$default_base")"
+
+  declare -g SYSTEM_PROMPT_FILE="$(config_get prompt.system "$HOME/.nlc/system_prompt")"
+  declare -g USER_PROMPT_FILE="$(config_get prompt.user "$HOME/.nlc/user_prompt")"
+
+  declare -g EDITOR="${EDITOR:-vi}"
 
 }
 
@@ -502,7 +1589,15 @@ run() {
   parse_requirements "${input[@]}"
 
   case "$action" in
-    "root") root_command ;;
+    "run") nlc_run_command ;;
+    "config") nlc_config_command ;;
+    "config show") nlc_config_show_command ;;
+    "config clear") nlc_config_clear_command ;;
+    "config edit") nlc_config_edit_command ;;
+    "config create") nlc_config_create_command ;;
+    "prompt") nlc_prompt_command ;;
+    "prompt system") nlc_prompt_system_command ;;
+    "prompt user") nlc_prompt_user_command ;;
   esac
 }
 

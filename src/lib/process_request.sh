@@ -6,21 +6,21 @@ process_request() {
   local response
   local content
 
-  auth_header="Authorization: Bearer $api_key"
+  auth_header="Authorization: Bearer $API_KEY"
   payload="$(build_payload "$user_request")"
 
-  response="$(curl -sS "$api_base/chat/completions" \
+  response="$(curl -sS "$API_BASE/chat/completions" \
     -H "Content-Type: application/json" \
     -H "$auth_header" \
     -d "$payload")" || {
-      printf "\rError contacting ${provider}" >&2
+      printf "\rError contacting ${PROVIDER}" >&2
       exit 2
     }
 
   if jq -e '.error' >/dev/null 2>&1 <<<"$response"; then
     local err
     err="$(jq -r '.error.message // "Unknown error"' <<<"$response")"
-    printf "\rError contacting ${provider}: ${err}" >&2
+    printf "\rError contacting ${PROVIDER}: ${err}" >&2
     exit 2
   fi
 

@@ -2,43 +2,76 @@ name: nlc
 help: Natural Language → Command
 version: 0.2.0
 
-dependencies: [curl, jq]
-
-args:
-- name: message
-  required: true
-  repeatable: true
-  help: Natural language description of the command you want to run
-
-filters: [api_key_found]
+examples: &examples
+  - nlc convert input.webm to output.mp4
+  - nlc list all docker images older than a month and delete them
 
 environment_variables:
-- name: nlc_provider
-  help: The provider to use (openai or groq)
-  default: openai
-  allowed: [openai, groq]
-- name: openai_api_key
-  help: Your OpenAI API key
-- name: groq_api_key
-  help: Your Groq API key
-- name: nlc_model
-  help: The model to use (default depending on provider)
-- name: nlc_prompt_file
-  default: "$HOME/.nlc_prompt"
-  help: >
-    Path to an additional system prompt that will be appended to the default
-    system prompt.
+- name: NLC_CONFIG
+  help: Path to the NLC config file
+  default: "$HOME/.nlc/config"
 
 variables:
-- name: api_base
-- name: api_key
-- name: model
-  value: $NLC_MODEL
-- name: provider
-  value: $NLC_PROVIDER
-- name: prompt_file
-  value: $NLC_PROMPT_FILE
+- name: CONFIG_FILE
+  value: $NLC_CONFIG
 
-examples:
-- nlc convert input.webm to output.mp4 using the best standards and ffmpeg
-- nlc list all docker images older than a month and delete them
+commands:
+- name: run
+  help: Run a natural language command
+  default: true
+  dependencies: [curl, jq]
+  filters: [api_key_found]
+  examples: *examples
+  args:
+  - name: message
+    required: true
+    repeatable: true
+    help: Natural language description of the command you want to run
+
+- name: config
+  help: Manage configuration
+  commands:
+  - name: show
+    help: Show confiruation and environment
+  - name: clear
+    help: Delete the config file (falling back to default values)
+  - name: edit
+    help: Edit the confiruation file (create it first if needed)
+  - name: create
+    help: Create a new config file
+    flags:
+    - long: --force
+      short: -f
+      help: Overwrite file if it exists
+
+- name: prompt
+  help: Manage system prompt
+  commands:
+  - name: system
+    help: Show or edit system prompt
+    flags:
+    - long: --edit
+      short: -e
+      help: Open the file for editing
+    - long: --default
+      short: -d
+      help: |
+        Copy the default system prompt to the override file.
+        Useful with --edit
+    - long: --clear
+      short: -c
+      help: Delete the prompt override file
+
+    examples: |
+      # clone the default config and open for editing"
+      nlc prompt system -ed
+
+  - name: user
+    help: Show or edit user prompt
+    flags:
+    - long: --edit
+      short: -e
+      help: Open the file for editing
+    - long: --clear
+      short: -c
+      help: Delete the prompt override file
