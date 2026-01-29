@@ -9,11 +9,7 @@ examples: &examples
 environment_variables:
 - name: NLC_CONFIG
   help: Path to the NLC config file
-  default: "$HOME/.nlc/config"
-
-variables:
-- name: CONFIG_FILE
-  value: $NLC_CONFIG
+  default: "~/.nlc/config"
 
 commands:
 - name: run

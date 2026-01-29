@@ -50,7 +50,7 @@ nlc_usage() {
     # :environment_variable.usage
     printf "  %s\n" "$(green "NLC_CONFIG")"
     printf "    Path to the NLC config file\n"
-    printf "    %s\n" "Default: $HOME/.nlc/config"
+    printf "    %s\n" "Default: ~/.nlc/config"
     echo
 
     # :command.usage_examples
@@ -897,7 +897,7 @@ parse_requirements() {
 
   # :command.environment_variables_filter
   # :command.environment_variables_default
-  export NLC_CONFIG="${NLC_CONFIG:-$HOME/.nlc/config}"
+  export NLC_CONFIG="${NLC_CONFIG:-~/.nlc/config}"
 
   env_var_names+=("NLC_CONFIG")
 
@@ -1559,11 +1559,7 @@ initialize() {
   set -eo pipefail
 
   # :command.environment_variables_default
-  export NLC_CONFIG="${NLC_CONFIG:-$HOME/.nlc/config}"
-
-  # :command.variables
-  # :variable.definition
-  declare -g CONFIG_FILE="$NLC_CONFIG"
+  export NLC_CONFIG="${NLC_CONFIG:-~/.nlc/config}"
 
   # src/initialize.sh
   declare -g PROVIDER
@@ -1573,6 +1569,9 @@ initialize() {
   declare -g SYSTEM_PROMPT_FILE
   declare -g USER_PROMPT_FILE
   declare -g EDITOR
+  declare -g CONFIG_FILE
+
+  CONFIG_FILE=${NLC_CONFIG/#\~/$HOME}
 
   PROVIDER="$(config_get ai.provider openai)"
 

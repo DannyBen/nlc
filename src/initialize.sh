@@ -5,6 +5,9 @@ declare -g API_BASE
 declare -g SYSTEM_PROMPT_FILE
 declare -g USER_PROMPT_FILE
 declare -g EDITOR
+declare -g CONFIG_FILE
+
+CONFIG_FILE=${NLC_CONFIG/#\~/$HOME}
 
 PROVIDER="$(config_get ai.provider openai)"
 

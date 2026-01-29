@@ -20,7 +20,7 @@ nlc - Natural Language → Command
 [1mEnvironment Variables:[0m
   [32mNLC_CONFIG[0m
     Path to the NLC config file
-    Default: /home/vagrant/.nlc/config
+    Default: ~/.nlc/config
 
 [1mExamples:[0m
   nlc convert input.webm to output.mp4
