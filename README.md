@@ -1,34 +1,35 @@
 # nlc — Natural Language → Command
 
-`nlc` is a tiny command-line helper that turns natural language instructions
+`nlc` is a command-line helper that turns natural language instructions
 into executable shell commands using [OpenAI]
 (https://platform.openai.com/) models, or any model available through
 [Groq](https://groq.com/).
-
-It’s designed to be minimal and intuitive:
 
 - You type what you want in plain English.
 - It shows you the generated command inline with a `$` prompt.
 - Press **Enter** to execute, or anything else to cancel.
 
+## Usage
+
+`nlc` is built with [Bashly](https://bashly.dev) and includes utility
+subcommands. Use `nlc --help` to see top-level commands, then
+`nlc COMMAND --help` for details.
+
+At a high level:
+
+- `run` (default) turns a natural language message into a shell command.
+- `config` lets you create, edit, show, or clear the config file.
+- `prompt` lets you view or customize the system and user prompts.
+
 ## Installation
 
-1. Download the nlc file and place it in your path
-2. Install `openai`
-   ```console
-   pip install openai
-   # or
-   uv tool install openai
-   ```
+**Manual**:  
+Download the nlc file from the [releases] page, or straight from the master
+branch if you want the unreleased version. Place it in your path.
 
-## Setup
+**With eget**:  
+```shell
+sudo eget dannyben/nlc --to /usr/local/bin
+```
 
-1. Export your OpenAI API key:
-   ```console
-   export OPENAI_API_KEY=sk-...
-   ```
-
-2. (Optional) Pick a default model:
-   ```console
-   export OPENAI_MODEL=gpt-4o-mini
-   ```
+[releases]: https://github.com/DannyBen/nlc/releases
