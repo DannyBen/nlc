@@ -1,8 +1,8 @@
 # nlc — Natural Language → Command
 
 `nlc` is a command-line helper that turns natural language instructions
-into executable shell commands using [OpenAI]
-(https://platform.openai.com/) models, or any model available through
+into executable shell commands using
+[OpenAI](https://platform.openai.com/) models, or any model available through
 [Groq](https://groq.com/).
 
 - You type what you want in plain English.
