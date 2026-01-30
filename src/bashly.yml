@@ -26,6 +26,7 @@ commands:
 
 - name: config
   help: Manage configuration
+  expose: always
   commands:
   - name: show
     help: Show confiruation and environment
@@ -42,6 +43,7 @@ commands:
 
 - name: prompt
   help: Manage system prompt
+  expose: always
   commands:
   - name: system
     help: Show or edit system prompt

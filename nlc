@@ -26,9 +26,15 @@ nlc_usage() {
   echo
   # :command.usage_commands
   printf "%s\n" "$(bold "Commands:")"
-  printf "  %s   Run a natural language command (default)\n" "$(green "run")   "
-  printf "  %s   Manage configuration\n" "$(green "config")"
-  printf "  %s   Manage system prompt\n" "$(green "prompt")"
+  printf "  %s   Run a natural language command (default)\n" "$(green "run")          "
+  printf "  %s   Manage configuration\n" "$(green "config")       "
+  printf "  %s   Show confiruation and environment\n" "$(green "config show")  "
+  printf "  %s   Delete the config file (falling back to default values)\n" "$(green "config clear") "
+  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "config edit")  "
+  printf "  %s   Create a new config file\n" "$(green "config create")"
+  printf "  %s   Manage system prompt\n" "$(green "prompt")       "
+  printf "  %s   Show or edit system prompt\n" "$(green "prompt system")"
+  printf "  %s   Show or edit user prompt\n" "$(green "prompt user")  "
   echo
 
   # :command.long_usage
