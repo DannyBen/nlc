@@ -14,13 +14,9 @@ describe "config"
 
   approve "nlc config clear --help"
 
-  describe "deleting config"
-    mkdir -p tmp
-    cp fixtures/nlc_config.ini tmp
-    NLC_CONFIG=tmp/nlc_config.ini
-    
-    approve "nlc config clear"
-    [[ -f "$NLC_CONFIG" ]] && fail "$NLC_CONFIG expected to be gone"
-    
-    NLC_CONFIG=fixtures/nlc_config.ini
+  # -- DESTRUCTIVE COMMANDS ---
+
+  approve "nlc config clear"
+  test -f "$NLC_CONFIG" && fail "$NLC_CONFIG expected to be gone"
+  reset_state
 

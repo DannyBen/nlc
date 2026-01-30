@@ -933,6 +933,7 @@ nlc_helper_distro_command() {
 
   # src/commands/helper/distro.sh
   if [ -r /etc/os-release ]; then
+    # shellcheck disable=SC1091
     . /etc/os-release
     echo "${PRETTY_NAME:-${NAME:-${ID:-unknown}}}"
   else
