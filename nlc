@@ -330,54 +330,6 @@ nlc_prompt_user_usage() {
   fi
 }
 
-# :command.usage
-nlc_helper_usage() {
-  printf "nlc helper - Internal helper functions\n\n"
-
-  printf "%s\n" "$(bold "Usage:")"
-  printf "  nlc helper COMMAND\n"
-  printf "  nlc helper [COMMAND] --help | -h\n"
-  echo
-  # :command.usage_commands
-  printf "%s\n" "$(bold "Commands:")"
-  printf "  %s   Show OS distro name\n" "$(green "distro")"
-  echo
-
-  # :command.long_usage
-  if [[ -n "$long_usage" ]]; then
-    # :command.usage_options
-    printf "%s\n" "$(bold "Options:")"
-
-    # :command.usage_fixed_flags
-    printf "  %s\n" "$(green "--help, -h")"
-    printf "    Show this help\n"
-    echo
-
-  fi
-}
-
-# :command.usage
-nlc_helper_distro_usage() {
-  printf "nlc helper distro - Show OS distro name\n\n"
-
-  printf "%s\n" "$(bold "Usage:")"
-  printf "  nlc helper distro\n"
-  printf "  nlc helper distro --help | -h\n"
-  echo
-
-  # :command.long_usage
-  if [[ -n "$long_usage" ]]; then
-    # :command.usage_options
-    printf "%s\n" "$(bold "Options:")"
-
-    # :command.usage_fixed_flags
-    printf "  %s\n" "$(green "--help, -h")"
-    printf "    Show this help\n"
-    echo
-
-  fi
-}
-
 # :command.normalize_input
 # :command.normalize_input_function
 normalize_input() {
@@ -693,7 +645,7 @@ prompt_default() {
   echo "Quote/escape filenames or arguments when necessary."
   echo "If the request is ambiguous, choose sensible defaults rather than asking questions."
   echo "Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine)."
-  echo "OS Distro: $(nlc helper distro)"
+  echo "OS Distro: $(distro)"
 }
 
 # src/lib/prompt/full.sh
@@ -766,6 +718,17 @@ magenta_underlined() { print_in_color "\e[4;35m" "$*"; }
 cyan_underlined() { print_in_color "\e[4;36m" "$*"; }
 black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
+
+# src/lib/util/distro.sh
+distro() {
+  if [ -r /etc/os-release ]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    echo "${PRETTY_NAME:-${NAME:-${ID:-unknown}}}"
+  else
+    echo "Unknown"
+  fi
+}
 
 # src/lib/util/strip_code_fences.sh
 strip_code_fences() {
@@ -928,20 +891,6 @@ nlc_prompt_user_command() {
   fi
 }
 
-# :command.function
-nlc_helper_distro_command() {
-
-  # src/commands/helper/distro.sh
-  if [ -r /etc/os-release ]; then
-    # shellcheck disable=SC1091
-    . /etc/os-release
-    echo "${PRETTY_NAME:-${NAME:-${ID:-unknown}}}"
-  else
-    echo "Unknown"
-  fi
-
-}
-
 # :command.parse_requirements
 parse_requirements() {
   local key
@@ -997,13 +946,6 @@ parse_requirements() {
       action="prompt"
       shift
       nlc_prompt_parse_requirements "$@"
-      shift $#
-      ;;
-
-    helper)
-      action="helper"
-      shift
-      nlc_helper_parse_requirements "$@"
       shift $#
       ;;
 
@@ -1633,126 +1575,9 @@ nlc_prompt_user_parse_requirements() {
 
 }
 
-# :command.parse_requirements
-nlc_helper_parse_requirements() {
-  local key
-
-  # :command.fixed_flags_filter
-  while [[ $# -gt 0 ]]; do
-    key="$1"
-    case "$key" in
-      --help | -h)
-        long_usage=yes
-        nlc_helper_usage
-        exit
-        ;;
-
-      *)
-        break
-        ;;
-
-    esac
-  done
-
-  # :command.command_filter
-  action=${1:-}
-
-  case $action in
-    -*) ;;
-
-    distro)
-      action="distro"
-      shift
-      nlc_helper_distro_parse_requirements "$@"
-      shift $#
-      ;;
-
-    # :command.command_fallback
-    "")
-      nlc_helper_usage >&2
-      exit 1
-      ;;
-
-    *)
-      printf "invalid command: %s\n" "$action" >&2
-      exit 1
-      ;;
-
-  esac
-
-  # :command.parse_requirements_while
-  while [[ $# -gt 0 ]]; do
-    key="$1"
-    case "$key" in
-
-      -?*)
-        printf "invalid option: %s\n" "$key" >&2
-        exit 1
-        ;;
-
-      *)
-        # :command.parse_requirements_case
-        # :command.parse_requirements_case_simple
-        printf "invalid argument: %s\n" "$key" >&2
-        exit 1
-
-        ;;
-
-    esac
-  done
-
-}
-
-# :command.parse_requirements
-nlc_helper_distro_parse_requirements() {
-  local key
-
-  # :command.fixed_flags_filter
-  while [[ $# -gt 0 ]]; do
-    key="$1"
-    case "$key" in
-      --help | -h)
-        long_usage=yes
-        nlc_helper_distro_usage
-        exit
-        ;;
-
-      *)
-        break
-        ;;
-
-    esac
-  done
-
-  # :command.command_filter
-  action="helper distro"
-
-  # :command.parse_requirements_while
-  while [[ $# -gt 0 ]]; do
-    key="$1"
-    case "$key" in
-
-      -?*)
-        printf "invalid option: %s\n" "$key" >&2
-        exit 1
-        ;;
-
-      *)
-        # :command.parse_requirements_case
-        # :command.parse_requirements_case_simple
-        printf "invalid argument: %s\n" "$key" >&2
-        exit 1
-
-        ;;
-
-    esac
-  done
-
-}
-
 # :command.initialize
 initialize() {
-  declare -g version="0.2.0"
+  declare -g version="0.2.1"
   set -eo pipefail
 
   # :command.environment_variables_default
@@ -1818,8 +1643,6 @@ run() {
     "prompt") nlc_prompt_command ;;
     "prompt system") nlc_prompt_system_command ;;
     "prompt user") nlc_prompt_user_command ;;
-    "helper") nlc_helper_command ;;
-    "helper distro") nlc_helper_distro_command ;;
   esac
 }
 
