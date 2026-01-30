@@ -6,6 +6,12 @@ nlc - Natural Language → Command
   nlc --version | -v
 
 [1mCommands:[0m
-  [32mrun[0m      Run a natural language command (default)
-  [32mconfig[0m   Manage configuration
-  [32mprompt[0m   Manage system prompt
+  [32mrun[0m             Run a natural language command (default)
+  [32mconfig[0m          Manage configuration
+  [32mconfig show[0m     Show confiruation and environment
+  [32mconfig clear[0m    Delete the config file (falling back to default values)
+  [32mconfig edit[0m     Edit the confiruation file (create it first if needed)
+  [32mconfig create[0m   Create a new config file
+  [32mprompt[0m          Manage system prompt
+  [32mprompt system[0m   Show or edit system prompt
+  [32mprompt user[0m     Show or edit user prompt

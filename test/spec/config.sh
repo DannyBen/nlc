@@ -3,6 +3,7 @@ describe "config"
   approve "nlc config"
 
   approve "nlc config show --help"
+  allow_diff "are a command.*"
   approve "nlc config show"
 
   approve "nlc config edit --help"
@@ -10,3 +11,12 @@ describe "config"
 
   approve "nlc config create --help"
   approve "nlc config create"
+
+  approve "nlc config clear --help"
+
+  # -- DESTRUCTIVE COMMANDS ---
+
+  approve "nlc config clear"
+  test -f "$NLC_CONFIG" && fail "$NLC_CONFIG expected to be gone"
+  reset_state
+

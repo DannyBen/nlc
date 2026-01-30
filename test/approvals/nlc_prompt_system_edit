@@ -1,2 +1,2 @@
-editstub [32mfixtures/system_prompt.txt[0m
-editstub fixtures/system_prompt.txt
+editstub [32mtmp/system_prompt.txt[0m
+editstub tmp/system_prompt.txt

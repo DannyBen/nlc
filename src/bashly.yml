@@ -26,6 +26,7 @@ commands:
 
 - name: config
   help: Manage configuration
+  expose: always
   commands:
   - name: show
     help: Show confiruation and environment
@@ -42,6 +43,7 @@ commands:
 
 - name: prompt
   help: Manage system prompt
+  expose: always
   commands:
   - name: system
     help: Show or edit system prompt
@@ -69,3 +71,10 @@ commands:
     - long: --clear
       short: -c
       help: Delete the prompt override file
+
+- name: helper
+  help: Internal helper functions
+  private: true
+  commands:
+  - name: distro
+    help: Show OS distro name
