@@ -3,6 +3,7 @@ describe "config"
   approve "nlc config"
 
   approve "nlc config show --help"
+  allow_diff "are a command.*"
   approve "nlc config show"
 
   approve "nlc config edit --help"

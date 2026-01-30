@@ -13,7 +13,7 @@
   [32mSYSTEM_PROMPT_FILE[0m : fixtures/system_prompt.txt
 
 [1;4mPrompts[0m
-  [32msystem_prompt[0m      : You are a command-li...direction are fine).
+  [32msystem_prompt[0m      : You *
   [32muser_prompt[0m        : provide all commands for arch linux
 
 [1;4mFiles[0m

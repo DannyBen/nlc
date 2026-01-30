@@ -3,6 +3,7 @@ describe "prompt"
   approve "nlc prompt"
 
   approve "nlc prompt system --help"
+  allow_diff "OS Distro:.*"
   approve "nlc prompt system"
   approve "nlc prompt system --edit"
 

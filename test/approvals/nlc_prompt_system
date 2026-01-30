@@ -8,3 +8,4 @@ Default to safe, non-destructive options unless explicitly requested otherwise.
 Quote/escape filenames or arguments when necessary.
 If the request is ambiguous, choose sensible defaults rather than asking questions.
 Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine).
+*

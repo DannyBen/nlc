@@ -9,4 +9,6 @@ prompt_default() {
   echo "Quote/escape filenames or arguments when necessary."
   echo "If the request is ambiguous, choose sensible defaults rather than asking questions."
   echo "Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine)."
+  echo "OS Distro: $(nlc helper distro)"
 }
+

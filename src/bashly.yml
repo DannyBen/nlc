@@ -71,3 +71,10 @@ commands:
     - long: --clear
       short: -c
       help: Delete the prompt override file
+
+- name: helper
+  help: Internal helper functions
+  private: true
+  commands:
+  - name: distro
+    help: Show OS distro name
