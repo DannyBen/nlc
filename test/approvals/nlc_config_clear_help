@@ -1,0 +1,9 @@
+nlc config clear - Delete the config file (falling back to default values)
+
+[1mUsage:[0m
+  nlc config clear
+  nlc config clear --help | -h
+
+[1mOptions:[0m
+  [32m--help, -h[0m
+    Show this help
