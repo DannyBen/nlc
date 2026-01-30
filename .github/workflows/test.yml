@@ -20,24 +20,11 @@ jobs:
     - name: Run shellcheck tests
       run: shellcheck nlc
 
-    - name: Configure Ruby for the mock server
-      uses: ruby/setup-ruby@v1
-      with: 
-        ruby-version: '3.4'
-        bundler-cache: true
-
-    - name: Install mock server dependencies
-      run: gem install sinatra puma rackup mime-types
-
     - name: Start mock server
-      run: |
-        ruby test/mockserver/mockserver.rb &
-        sleep 3
+      run: docker run -d --rm --name mockly -v "$PWD/test/mockly:/app/mocks" -p 3000:3000 dannyben/mockly
 
-    # DEBUG
-    # - name: Setup tmate session
-    #   uses: mxschmitt/action-tmate@v3
-    # DEBUG
+    - name: Wait for mock server to boot
+      run: timeout 30 bash -c 'until curl -sf http://localhost:3000; do sleep 1; done'
 
     - name: Run approval tests
       run: test/approve
