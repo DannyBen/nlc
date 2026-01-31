@@ -31,7 +31,7 @@ nlc_usage() {
   printf "  %s   Show confiruation and environment\n" "$(green "config show")  "
   printf "  %s   Delete the config file (falling back to default values)\n" "$(green "config clear") "
   printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "config edit")  "
-  printf "  %s   Create a new config file\n" "$(green "config create")"
+  printf "  %s   Create a new config file\n" "$(green "config new")   "
   printf "  %s   Manage system prompt\n" "$(green "prompt")       "
   printf "  %s   Show or edit system prompt\n" "$(green "prompt system")"
   printf "  %s   Show or edit user prompt\n" "$(green "prompt user")  "
@@ -114,10 +114,10 @@ nlc_config_usage() {
   echo
   # :command.usage_commands
   printf "%s\n" "$(bold "Commands:")"
-  printf "  %s   Show confiruation and environment\n" "$(green "show")  "
-  printf "  %s   Delete the config file (falling back to default values)\n" "$(green "clear") "
-  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "edit")  "
-  printf "  %s   Create a new config file\n" "$(green "create")"
+  printf "  %s   Show confiruation and environment\n" "$(green "show") "
+  printf "  %s   Delete the config file (falling back to default values)\n" "$(green "clear")"
+  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "edit") "
+  printf "  %s   Create a new config file\n" "$(green "new")  "
   echo
 
   # :command.long_usage
@@ -136,6 +136,8 @@ nlc_config_usage() {
 # :command.usage
 nlc_config_show_usage() {
   printf "nlc config show - Show confiruation and environment\n\n"
+  printf "Alias: s\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  nlc config show\n"
@@ -158,6 +160,8 @@ nlc_config_show_usage() {
 # :command.usage
 nlc_config_clear_usage() {
   printf "nlc config clear - Delete the config file (falling back to default values)\n\n"
+  printf "Alias: c\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  nlc config clear\n"
@@ -180,6 +184,8 @@ nlc_config_clear_usage() {
 # :command.usage
 nlc_config_edit_usage() {
   printf "nlc config edit - Edit the confiruation file (create it first if needed)\n\n"
+  printf "Alias: e\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  nlc config edit\n"
@@ -200,12 +206,14 @@ nlc_config_edit_usage() {
 }
 
 # :command.usage
-nlc_config_create_usage() {
-  printf "nlc config create - Create a new config file\n\n"
+nlc_config_new_usage() {
+  printf "nlc config new - Create a new config file\n\n"
+  printf "Alias: n\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
-  printf "  nlc config create [OPTIONS]\n"
-  printf "  nlc config create --help | -h\n"
+  printf "  nlc config new [OPTIONS]\n"
+  printf "  nlc config new --help | -h\n"
   echo
 
   # :command.long_usage
@@ -257,6 +265,8 @@ nlc_prompt_usage() {
 # :command.usage
 nlc_prompt_system_usage() {
   printf "nlc prompt system - Show or edit system prompt\n\n"
+  printf "Alias: s\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  nlc prompt system [OPTIONS]\n"
@@ -300,6 +310,8 @@ nlc_prompt_system_usage() {
 # :command.usage
 nlc_prompt_user_usage() {
   printf "nlc prompt user - Show or edit user prompt\n\n"
+  printf "Alias: u\n"
+  echo
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  nlc prompt user [OPTIONS]\n"
@@ -643,6 +655,7 @@ prompt_default() {
   echo "Prefer short commands, do NOT overengineer."
   echo "Default to safe, non-destructive options unless explicitly requested otherwise."
   echo "Quote/escape filenames or arguments when necessary."
+  echo "Assume all operations are to be executed in the current directory unless requested otherwise"
   echo "If the request is ambiguous, choose sensible defaults rather than asking questions."
   echo "Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine)."
   echo "OS Distro: $(distro)"
@@ -837,9 +850,9 @@ nlc_config_edit_command() {
 }
 
 # :command.function
-nlc_config_create_command() {
+nlc_config_new_command() {
 
-  # src/commands/config/create.sh
+  # src/commands/config/new.sh
   force="${args[--force]}"
   if [[ -f "$CONFIG_FILE" && -z "$force" ]]; then
     printf "config file already exists: %s\n" "$(green "$CONFIG_FILE")"
@@ -1107,31 +1120,31 @@ nlc_config_parse_requirements() {
   case $action in
     -*) ;;
 
-    show)
+    show | s)
       action="show"
       shift
       nlc_config_show_parse_requirements "$@"
       shift $#
       ;;
 
-    clear)
+    clear | c)
       action="clear"
       shift
       nlc_config_clear_parse_requirements "$@"
       shift $#
       ;;
 
-    edit)
+    edit | e)
       action="edit"
       shift
       nlc_config_edit_parse_requirements "$@"
       shift $#
       ;;
 
-    create)
-      action="create"
+    new | n)
+      action="new"
       shift
-      nlc_config_create_parse_requirements "$@"
+      nlc_config_new_parse_requirements "$@"
       shift $#
       ;;
 
@@ -1313,7 +1326,7 @@ nlc_config_edit_parse_requirements() {
 }
 
 # :command.parse_requirements
-nlc_config_create_parse_requirements() {
+nlc_config_new_parse_requirements() {
   local key
 
   # :command.fixed_flags_filter
@@ -1322,7 +1335,7 @@ nlc_config_create_parse_requirements() {
     case "$key" in
       --help | -h)
         long_usage=yes
-        nlc_config_create_usage
+        nlc_config_new_usage
         exit
         ;;
 
@@ -1334,7 +1347,7 @@ nlc_config_create_parse_requirements() {
   done
 
   # :command.command_filter
-  action="config create"
+  action="config new"
 
   # :command.parse_requirements_while
   while [[ $# -gt 0 ]]; do
@@ -1393,14 +1406,14 @@ nlc_prompt_parse_requirements() {
   case $action in
     -*) ;;
 
-    system)
+    system | s)
       action="system"
       shift
       nlc_prompt_system_parse_requirements "$@"
       shift $#
       ;;
 
-    user)
+    user | u)
       action="user"
       shift
       nlc_prompt_user_parse_requirements "$@"
@@ -1577,7 +1590,7 @@ nlc_prompt_user_parse_requirements() {
 
 # :command.initialize
 initialize() {
-  declare -g version="0.2.1"
+  declare -g version="0.2.2"
   set -eo pipefail
 
   # :command.environment_variables_default
@@ -1639,7 +1652,7 @@ run() {
     "config show") nlc_config_show_command ;;
     "config clear") nlc_config_clear_command ;;
     "config edit") nlc_config_edit_command ;;
-    "config create") nlc_config_create_command ;;
+    "config new") nlc_config_new_command ;;
     "prompt") nlc_prompt_command ;;
     "prompt system") nlc_prompt_system_command ;;
     "prompt user") nlc_prompt_user_command ;;

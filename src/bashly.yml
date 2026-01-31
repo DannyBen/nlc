@@ -1,6 +1,6 @@
 name: nlc
 help: Natural Language → Command
-version: 0.2.1
+version: 0.2.2
 
 examples: &examples
   - nlc convert input.webm to output.mp4
@@ -30,11 +30,15 @@ commands:
   commands:
   - name: show
     help: Show confiruation and environment
+    alias: s
   - name: clear
     help: Delete the config file (falling back to default values)
+    alias: c
   - name: edit
     help: Edit the confiruation file (create it first if needed)
-  - name: create
+    alias: e
+  - name: new
+    alias: 'n'
     help: Create a new config file
     flags:
     - long: --force
@@ -47,6 +51,7 @@ commands:
   commands:
   - name: system
     help: Show or edit system prompt
+    alias: s
     flags:
     - long: --edit
       short: -e
@@ -64,6 +69,7 @@ commands:
 
   - name: user
     help: Show or edit user prompt
+    alias: u
     flags:
     - long: --edit
       short: -e

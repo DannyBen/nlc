@@ -1,8 +1,10 @@
-nlc config create - Create a new config file
+nlc config new - Create a new config file
+
+Alias: n
 
 [1mUsage:[0m
-  nlc config create [OPTIONS]
-  nlc config create --help | -h
+  nlc config new [OPTIONS]
+  nlc config new --help | -h
 
 [1mOptions:[0m
   [32m--force, -f[0m

@@ -1,5 +1,7 @@
 nlc prompt system - Show or edit system prompt
 
+Alias: s
+
 [1mUsage:[0m
   nlc prompt system [OPTIONS]
   nlc prompt system --help | -h
