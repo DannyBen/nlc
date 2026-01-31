@@ -1,5 +1,7 @@
 nlc config edit - Edit the confiruation file (create it first if needed)
 
+Alias: e
+
 [1mUsage:[0m
   nlc config edit
   nlc config edit --help | -h

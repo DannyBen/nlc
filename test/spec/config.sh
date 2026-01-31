@@ -9,8 +9,8 @@ describe "config"
   approve "nlc config edit --help"
   approve "nlc config edit"
 
-  approve "nlc config create --help"
-  approve "nlc config create"
+  approve "nlc config new --help"
+  approve "nlc config new"
 
   approve "nlc config clear --help"
 

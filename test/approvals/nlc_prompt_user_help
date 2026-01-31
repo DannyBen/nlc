@@ -1,5 +1,7 @@
 nlc prompt user - Show or edit user prompt
 
+Alias: u
+
 [1mUsage:[0m
   nlc prompt user [OPTIONS]
   nlc prompt user --help | -h

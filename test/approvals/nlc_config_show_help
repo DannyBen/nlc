@@ -1,5 +1,7 @@
 nlc config show - Show confiruation and environment
 
+Alias: s
+
 [1mUsage:[0m
   nlc config show
   nlc config show --help | -h

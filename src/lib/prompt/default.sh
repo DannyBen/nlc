@@ -7,6 +7,7 @@ prompt_default() {
   echo "Prefer short commands, do NOT overengineer."
   echo "Default to safe, non-destructive options unless explicitly requested otherwise."
   echo "Quote/escape filenames or arguments when necessary."
+  echo "Assume all operations are to be executed in the current directory unless requested otherwise"
   echo "If the request is ambiguous, choose sensible defaults rather than asking questions."
   echo "Output must be valid for /bin/bash -lc (newlines, pipes, redirection are fine)."
   echo "OS Distro: $(distro)"

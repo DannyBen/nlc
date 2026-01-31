@@ -5,10 +5,10 @@ nlc config - Manage configuration
   nlc config [COMMAND] --help | -h
 
 [1mCommands:[0m
-  [32mshow[0m     Show confiruation and environment
-  [32mclear[0m    Delete the config file (falling back to default values)
-  [32medit[0m     Edit the confiruation file (create it first if needed)
-  [32mcreate[0m   Create a new config file
+  [32mshow[0m    Show confiruation and environment
+  [32mclear[0m   Delete the config file (falling back to default values)
+  [32medit[0m    Edit the confiruation file (create it first if needed)
+  [32mnew[0m     Create a new config file
 
 [1mOptions:[0m
   [32m--help, -h[0m
