@@ -1,5 +1,7 @@
 # nlc - Natural Language -> Command
 
+![repocard](repocard.svg)
+
 `nlc` is a command-line bash script that turns natural language instructions
 into executable shell commands using
 [OpenAI](https://platform.openai.com/) models, or any model available through
