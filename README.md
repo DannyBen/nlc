@@ -27,13 +27,16 @@ information.
 
 ## Installation
 
-**Manual**:  
 Download the nlc file from the [releases] page, or straight from the master
-branch if you want the unreleased version. Place it in your PATH.
+branch if you want the unreleased version. Place it in any directory that is 
+already in your PATH.
 
-**With eget**:  
+Alternatively, run this:
+
 ```shell
-sudo eget dannyben/nlc --to /usr/local/bin
+# This downloads the latest release version
+wget https://get.dannyb.co/nlc
+sudo install nlc /usr/local/bin
 ```
 
 [releases]: https://github.com/DannyBen/nlc/releases
