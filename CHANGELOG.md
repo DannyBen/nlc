@@ -1,6 +1,13 @@
 Changelog
 ========================================
 
+v0.2.3 - 2026-02-07
+----------------------------------------
+
+- Change default model to gpt-3.5-turbo [`d6c35cc`](https://github.com/DannyBen/nlc/commit/d6c35cc)
+- Compare [`v0.2.2..v0.2.3`](https://github.com/dannyben/nlc/compare/v0.2.2..v0.2.3)
+
+
 v0.2.1 - 2026-01-30
 ----------------------------------------
 
