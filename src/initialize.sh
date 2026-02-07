@@ -20,7 +20,7 @@ case "$PROVIDER" in
   *)
     default_base="https://api.openai.com/v1"
     default_key="$OPENAI_API_KEY"
-    default_model=gpt-4.1-mini
+    default_model=gpt-3.5-turbo
     ;;
 esac
 

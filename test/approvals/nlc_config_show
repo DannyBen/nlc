@@ -6,7 +6,7 @@
 [1;4mInternal Truth[0m
   [32mCONFIG_FILE[0m        : tmp/nlc_config.ini
   [32mPROVIDER[0m           : openai
-  [32mMODEL[0m              : gpt-4.1-mini
+  [32mMODEL[0m              : gpt-3.5-turbo
   [32mAPI_BASE[0m           : http://localhost:3000
   [32mAPI_KEY[0m            : not-needed
   [32mUSER_PROMPT_FILE[0m   : tmp/user_prompt.txt
