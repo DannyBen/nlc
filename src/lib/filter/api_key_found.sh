@@ -1,4 +1,4 @@
-## Validate client environemnt variables exist
+## Validate client environment variables exist
 filter_api_key_found() {
   if [[ "$PROVIDER" == "openai" && -z "$OPENAI_API_KEY" ]]; then
     echo "OPENAI_API_KEY not set"

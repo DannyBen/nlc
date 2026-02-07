@@ -1,6 +1,6 @@
 name: nlc
 help: Natural Language → Command
-version: 0.2.2
+version: 0.2.3
 
 examples: &examples
   - nlc convert input.webm to output.mp4

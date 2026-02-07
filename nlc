@@ -1590,7 +1590,7 @@ nlc_prompt_user_parse_requirements() {
 
 # :command.initialize
 initialize() {
-  declare -g version="0.2.2"
+  declare -g version="0.2.3"
   set -eo pipefail
 
   # :command.environment_variables_default
