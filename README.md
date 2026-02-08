@@ -1,6 +1,6 @@
 # nlc - Natural Language -> Command
 
-![repocard](repocard.svg)
+![repocard](https://repocard.dannyben.com/svg/nlc.svg)
 
 `nlc` is a command-line bash script that turns natural language instructions
 into executable shell commands using
