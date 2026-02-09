@@ -15,12 +15,12 @@ case "$PROVIDER" in
   groq)
     default_base="https://api.groq.com/openai/v1"
     default_key="$GROQ_API_KEY"
-    default_model="llama-3.3-70b-versatile"
+    default_model="$(default_model_for_provider "$PROVIDER")"
     ;;
   *)
     default_base="https://api.openai.com/v1"
     default_key="$OPENAI_API_KEY"
-    default_model=gpt-3.5-turbo
+    default_model="$(default_model_for_provider "$PROVIDER")"
     ;;
 esac
 

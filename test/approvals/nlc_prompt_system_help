@@ -20,5 +20,5 @@ Alias: s
     Show this help
 
 [1mExamples:[0m
-  # clone the default config and open for editing"
+  # clone the default system prompt and open for editing
   nlc prompt system -ed

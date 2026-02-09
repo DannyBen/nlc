@@ -29,13 +29,13 @@ commands:
   expose: always
   commands:
   - name: show
-    help: Show confiruation and environment
+    help: Show configuration and environment
     alias: s
   - name: clear
     help: Delete the config file (falling back to default values)
     alias: c
   - name: edit
-    help: Edit the confiruation file (create it first if needed)
+    help: Edit the configuration file (create it first if needed)
     alias: e
   - name: new
     alias: 'n'
@@ -64,7 +64,7 @@ commands:
       help: Delete the prompt override file
 
     examples: |
-      # clone the default config and open for editing"
+      # clone the default system prompt and open for editing
       nlc prompt system -ed
 
   - name: user

@@ -28,9 +28,9 @@ nlc_usage() {
   printf "%s\n" "$(bold "Commands:")"
   printf "  %s   Run a natural language command (default)\n" "$(green "run")          "
   printf "  %s   Manage configuration\n" "$(green "config")       "
-  printf "  %s   Show confiruation and environment\n" "$(green "config show")  "
+  printf "  %s   Show configuration and environment\n" "$(green "config show")  "
   printf "  %s   Delete the config file (falling back to default values)\n" "$(green "config clear") "
-  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "config edit")  "
+  printf "  %s   Edit the configuration file (create it first if needed)\n" "$(green "config edit")  "
   printf "  %s   Create a new config file\n" "$(green "config new")   "
   printf "  %s   Manage system prompt\n" "$(green "prompt")       "
   printf "  %s   Show or edit system prompt\n" "$(green "prompt system")"
@@ -114,9 +114,9 @@ nlc_config_usage() {
   echo
   # :command.usage_commands
   printf "%s\n" "$(bold "Commands:")"
-  printf "  %s   Show confiruation and environment\n" "$(green "show") "
+  printf "  %s   Show configuration and environment\n" "$(green "show") "
   printf "  %s   Delete the config file (falling back to default values)\n" "$(green "clear")"
-  printf "  %s   Edit the confiruation file (create it first if needed)\n" "$(green "edit") "
+  printf "  %s   Edit the configuration file (create it first if needed)\n" "$(green "edit") "
   printf "  %s   Create a new config file\n" "$(green "new")  "
   echo
 
@@ -135,7 +135,7 @@ nlc_config_usage() {
 
 # :command.usage
 nlc_config_show_usage() {
-  printf "nlc config show - Show confiruation and environment\n\n"
+  printf "nlc config show - Show configuration and environment\n\n"
   printf "Alias: s\n"
   echo
 
@@ -183,7 +183,7 @@ nlc_config_clear_usage() {
 
 # :command.usage
 nlc_config_edit_usage() {
-  printf "nlc config edit - Edit the confiruation file (create it first if needed)\n\n"
+  printf "nlc config edit - Edit the configuration file (create it first if needed)\n\n"
   printf "Alias: e\n"
   echo
 
@@ -301,7 +301,7 @@ nlc_prompt_system_usage() {
 
     # :command.usage_examples
     printf "%s\n" "$(bold "Examples:")"
-    printf "  # clone the default config and open for editing\"\n  nlc prompt system -ed\n"
+    printf "  # clone the default system prompt and open for editing\n  nlc prompt system -ed\n"
     echo
 
   fi
@@ -495,12 +495,26 @@ config_create_defaults() {
   mkdir -p -- "$config_dir"
 
   config_set ai.provider openai
-  config_set ai.model gpt-3.5-turbo
+  config_set ai.model "$(default_model_for_provider openai)"
   config_set ai.api_key
   config_set ai.api_base https://api.openai.com/v1
   config_set prompt.system "$HOME/.nlc/system_prompt"
   config_set prompt.user "$HOME/.nlc/user_prompt"
   config_save
+}
+
+# src/lib/config/default_model.sh
+default_model_for_provider() {
+  local provider="$1"
+
+  case "$provider" in
+    groq)
+      echo "llama-3.3-70b-versatile"
+      ;;
+    *)
+      echo "gpt-3.5-turbo"
+      ;;
+  esac
 }
 
 # src/lib/config/ini.sh
@@ -608,10 +622,10 @@ execute_command() {
 
 # src/lib/filter/api_key_found.sh
 filter_api_key_found() {
-  if [[ "$PROVIDER" == "openai" && -z "$OPENAI_API_KEY" ]]; then
-    echo "OPENAI_API_KEY not set"
-  elif [[ "$PROVIDER" == "groq" && -z "$GROQ_API_KEY" ]]; then
-    echo "GROQ_API_KEY not set"
+  if [[ "$PROVIDER" == "openai" && -z "$API_KEY" ]]; then
+    echo "OPENAI_API_KEY not set and ai.api_key is empty"
+  elif [[ "$PROVIDER" == "groq" && -z "$API_KEY" ]]; then
+    echo "GROQ_API_KEY not set and ai.api_key is empty"
   fi
 }
 
@@ -1614,12 +1628,12 @@ initialize() {
     groq)
       default_base="https://api.groq.com/openai/v1"
       default_key="$GROQ_API_KEY"
-      default_model="llama-3.3-70b-versatile"
+      default_model="$(default_model_for_provider "$PROVIDER")"
       ;;
     *)
       default_base="https://api.openai.com/v1"
       default_key="$OPENAI_API_KEY"
-      default_model=gpt-3.5-turbo
+      default_model="$(default_model_for_provider "$PROVIDER")"
       ;;
   esac
 
